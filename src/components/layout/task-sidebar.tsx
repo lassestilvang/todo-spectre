@@ -69,14 +69,22 @@ export function TaskSidebar() {
   };
 
   const fetchLabels = async () => {
-    // Mock data for now - will implement API later
-    const mockLabels = [
-      { id: 1, user_id: 1, name: 'Work', color: '#3b82f6', icon: '💼', created_at: new Date(), updated_at: new Date() },
-      { id: 2, user_id: 1, name: 'Personal', color: '#10b981', icon: '🏠', created_at: new Date(), updated_at: new Date() },
-      { id: 3, user_id: 1, name: 'Important', color: '#ef4444', icon: '⭐', created_at: new Date(), updated_at: new Date() },
-      { id: 4, user_id: 1, name: 'Shopping', color: '#f59e0b', icon: '🛒', created_at: new Date(), updated_at: new Date() }
-    ];
-    setLabels(mockLabels);
+    try {
+      const response = await fetch('/api/labels');
+      if (!response.ok) throw new Error('Failed to fetch labels');
+      const data = await response.json();
+      setLabels(data);
+    } catch (err) {
+      console.error('Error fetching labels:', err);
+      // Fallback to default labels if API fails
+      const defaultLabels = [
+        { id: 1, user_id: 1, name: 'Work', color: '#3b82f6', icon: '💼', created_at: new Date(), updated_at: new Date() },
+        { id: 2, user_id: 1, name: 'Personal', color: '#10b981', icon: '🏠', created_at: new Date(), updated_at: new Date() },
+        { id: 3, user_id: 1, name: 'Important', color: '#ef4444', icon: '⭐', created_at: new Date(), updated_at: new Date() },
+        { id: 4, user_id: 1, name: 'Shopping', color: '#f59e0b', icon: '🛒', created_at: new Date(), updated_at: new Date() }
+      ];
+      setLabels(defaultLabels);
+    }
   };
 
   const handleListCreated = (newList: List) => {
