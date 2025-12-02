@@ -26,7 +26,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
   const [estimate, setEstimate] = useState('');
   const [actualTime, setActualTime] = useState('');
   const [status, setStatus] = useState('pending');
-  const [recurring, setRecurring] = useState('');
+  const [recurring, setRecurring] = useState<string | null>(null);
   const [reminders, setReminders] = useState<string[]>([]);
   const [labels, setLabels] = useState<{name: string; color?: string; icon?: string}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +95,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
           estimate: estimate ? parseTimeToMinutes(estimate) : undefined,
           actual_time: actualTime ? parseTimeToMinutes(actualTime) : undefined,
           priority: parseInt(priority),
-          recurring: recurring || undefined,
+          recurring: recurring === 'none' ? undefined : recurring,
           status,
           task_labels: labels.map(label => ({
             name: label.name,
@@ -143,7 +143,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
   ];
 
   const recurringOptions = [
-    { value: '', label: 'None' },
+    { value: 'none', label: 'None' },
     { value: 'daily', label: 'Daily' },
     { value: 'weekly', label: 'Weekly' },
     { value: 'monthly', label: 'Monthly' },
