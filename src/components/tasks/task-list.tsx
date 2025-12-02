@@ -131,14 +131,14 @@ export function TaskList({ tasks, title, onTaskClick, onRefresh, isLoading, erro
 
       <div className="flex gap-2 mb-4">
         <Select
-          value={filterStatus || ''}
-          onValueChange={(value) => setFilterStatus(value === '' ? null : value)}
+          value={filterStatus || 'all_statuses'}
+          onValueChange={(value) => setFilterStatus(value === 'all_statuses' ? null : value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all_statuses">All Statuses</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="in_progress">In Progress</SelectItem>
             <SelectItem value="completed">Completed</SelectItem>
@@ -147,14 +147,14 @@ export function TaskList({ tasks, title, onTaskClick, onRefresh, isLoading, erro
         </Select>
 
         <Select
-          value={filterPriority?.toString() || ''}
-          onValueChange={(value) => setFilterPriority(value === '' ? null : parseInt(value))}
+          value={filterPriority?.toString() || 'all_priorities'}
+          onValueChange={(value) => setFilterPriority(value === 'all_priorities' ? null : parseInt(value))}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by priority" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Priorities</SelectItem>
+            <SelectItem value="all_priorities">All Priorities</SelectItem>
             <SelectItem value="0">None</SelectItem>
             <SelectItem value="1">Low</SelectItem>
             <SelectItem value="2">Medium</SelectItem>
