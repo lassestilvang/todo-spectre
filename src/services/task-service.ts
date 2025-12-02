@@ -503,4 +503,34 @@ export class TaskService implements ITaskService {
       throw new DatabaseError('Failed to get tasks by list', 'GET_TASKS_BY_LIST_ERROR', error);
     }
   }
+
+  async getTasksByLabel(userId: number, labelId: number): Promise<Task[]> {
+    try {
+      const tasks = await db.task.findMany({
+        where: {
+          list: {
+            user_id: userId
+          },
+          task_labels: {
+            some: {
+              label_id: labelId
+            }
+          }
+        },
+        include: {
+          task_logs: true,
+          task_labels: true,
+          task_attachments: true
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+
+      return tasks;
+    } catch (error) {
+      console.error('Error getting tasks by label:', error);
+      throw new DatabaseError('Failed to get tasks by label', 'GET_TASKS_BY_LABEL_ERROR', error);
+    }
+  }
 }
