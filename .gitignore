@@ -12,13 +12,18 @@
 
 # testing
 /coverage
+*.spec.ts
+*.test.ts
+*.test.js
 
 # next.js
 /.next/
 /out/
+.next/cache/
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -32,6 +37,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +45,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# logs
+logs/
+*.log
+
+# test results
+test-results/
