@@ -86,6 +86,7 @@ export function TaskSidebar() {
 
 
   const handleListSelect = (listId: number) => {
+    console.log(`List selected: ${listId}, navigating to /lists/${listId}`);
     setActiveListId(listId);
     router.push(`/lists/${listId}`);
   };
@@ -100,6 +101,7 @@ export function TaskSidebar() {
   };
 
   const handleLabelSelect = (labelId: number) => {
+    console.log(`Label selected: ${labelId}, navigating to /labels/${labelId}`);
     setActiveLabelId(labelId);
     router.push(`/labels/${labelId}`);
   };
