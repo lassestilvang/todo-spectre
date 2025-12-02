@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const { prisma: configuredPrisma } = require('./prisma/prisma.config');
+import { prisma as configuredPrisma } from './prisma/prisma.config';
 
 async function main() {
   console.log('Starting database initialization...');

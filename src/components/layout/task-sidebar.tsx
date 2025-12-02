@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { List } from '@/types/list-types';
 import { View } from '@/types/view-types';
@@ -9,14 +8,12 @@ import { Label } from '@/types/label-types';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
 import { Plus, Menu, X, Tag, List as ListIcon, Calendar, CheckSquare, Eye, EyeOff, Search } from 'lucide-react';
-import { ListItem } from '@/components/lists/list-item';
 import { CreateListForm } from '@/components/lists/create-list-form';
 import { CreateLabelForm } from '@/components/labels/create-label-form';
-import { LabelItem } from '@/components/labels/label-item';
 import { SearchModal } from '@/components/search/search-modal';
+import { useSearch } from '@/context/search-context';
 
 export function TaskSidebar() {
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -26,7 +23,6 @@ export function TaskSidebar() {
 
   // Lists state
   const [lists, setLists] = useState<List[]>([]);
-  const [activeListId, setActiveListId] = useState<number | null>(null);
   const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
 
   // Views state
@@ -36,11 +32,9 @@ export function TaskSidebar() {
     { id: 3, user_id: 1, name: 'Upcoming', type: 'month', show_completed: false, created_at: new Date(), updated_at: new Date() },
     { id: 4, user_id: 1, name: 'All Tasks', type: 'custom', show_completed: false, created_at: new Date(), updated_at: new Date() }
   ]);
-  const [activeViewId, setActiveViewId] = useState<number | null>(null);
 
   // Labels state
   const [labels, setLabels] = useState<Label[]>([]);
-  const [activeLabelId, setActiveLabelId] = useState<number | null>(null);
   const [isCreateLabelDialogOpen, setIsCreateLabelDialogOpen] = useState(false);
 
   // Search context
@@ -57,7 +51,7 @@ export function TaskSidebar() {
       const view = views.find(v => v.name.toLowerCase().replace(' ', '') === currentTab);
       if (view) setActiveViewId(view.id);
     }
-  }, []);
+  }, [searchParams, views]);
 
   const fetchLists = async () => {
     try {
@@ -87,12 +81,6 @@ export function TaskSidebar() {
     setActiveListId(newList.id);
   };
 
-  const handleListDeleted = (deletedListId: number) => {
-    setLists(lists.filter(list => list.id !== deletedListId));
-    if (activeListId === deletedListId && lists.length > 1) {
-      setActiveListId(lists[0].id);
-    }
-  };
 
   const handleListSelect = (listId: number) => {
     setActiveListId(listId);
@@ -119,33 +107,9 @@ export function TaskSidebar() {
     ));
   };
 
-  const getLinkClass = (path: string) => {
-    return `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
-      pathname === path ? 'bg-blue-100 dark:bg-blue-900/50 font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-    }`;
-  };
 
-  const getViewLinkClass = (viewId: number) => {
-    return `flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
-      activeViewId === viewId ? 'bg-blue-100 dark:bg-blue-900/50 font-medium' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-    }`;
-  };
 
-  const getListItemClass = (listId: number) => {
-    return `flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
-      activeListId === listId
-        ? 'bg-blue-100 dark:bg-blue-900/50'
-        : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-    }`;
-  };
 
-  const getLabelItemClass = (labelId: number) => {
-    return `flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
-      activeLabelId === labelId
-        ? 'bg-blue-100 dark:bg-blue-900/50'
-        : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-    }`;
-  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

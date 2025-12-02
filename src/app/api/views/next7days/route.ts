@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { TaskService } from '@/services/task-service';
 import { DatabaseError } from '@/lib/errors';
-import { startOfToday, endOfToday, addDays } from 'date-fns';
+import { endOfToday, addDays } from 'date-fns';
 
 export async function GET(request: Request) {
   try {

@@ -17,7 +17,6 @@ interface ListItemProps {
 
 export function ListItem({ list, isActive, onSelect, onDelete, onEdit }: ListItemProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {

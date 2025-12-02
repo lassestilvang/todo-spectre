@@ -1,3 +1,5 @@
+import { TaskFilterCriteria } from '@/types/filter-types';
+
 export interface Task {
   id: number;
   list_id?: number;
@@ -78,12 +80,12 @@ export interface UpdateTaskInput {
 }
 
 export interface TaskService {
-  getAllTasks(userId: number, filters?: any): Promise<Task[]>;
+  getAllTasks(userId: number, filters?: TaskFilterCriteria): Promise<Task[]>;
   getTaskById(id: number, userId: number): Promise<Task | null>;
   createTask(userId: number, data: CreateTaskInput): Promise<Task>;
   updateTask(id: number, userId: number, data: UpdateTaskInput): Promise<Task>;
   deleteTask(id: number, userId: number): Promise<void>;
-  addTaskLog(taskId: number, userId: number, action: string, changes?: any): Promise<TaskLog>;
+  addTaskLog(taskId: number, userId: number, action: string, changes?: Record<string, unknown>): Promise<TaskLog>;
   getTaskLogs(taskId: number, userId: number): Promise<TaskLog[]>;
   getTasksByDateRange(userId: number, startDate: Date, endDate: Date): Promise<Task[]>;
   getUpcomingTasks(userId: number): Promise<Task[]>;

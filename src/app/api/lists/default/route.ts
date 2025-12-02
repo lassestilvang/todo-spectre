@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { ListService } from '@/services/list-service';
 import { DatabaseError } from '@/lib/errors';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {

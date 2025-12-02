@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const query = searchParams.get('query') || '';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const filters: any = {};
+    const filters: Record<string, unknown> = {};
 
     // Parse query parameters for filtering
     if (searchParams.has('status')) {

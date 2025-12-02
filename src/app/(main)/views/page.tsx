@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ViewContainer } from '@/components/views/view-container';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +8,7 @@ import { Task } from '@/types/task-types';
 import { CreateTaskForm } from '@/components/tasks/create-task-form';
 import { TaskDetailView } from '@/components/tasks/task-detail-view';
 
-export default function ViewsPage() {
+function ViewsPageContent() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,11 +21,7 @@ export default function ViewsPage() {
   // Get active tab from URL or default to 'today'
   const activeTab = searchParams.get('tab') || 'today';
 
-  useEffect(() => {
-    fetchTasks();
-  }, [activeTab, showCompleted, searchParams]);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -61,9 +57,13 @@ export default function ViewsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab, showCompleted]);
 
-  const handleTaskCreated = (newTask: Task) => {
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  const handleTaskCreated = () => {
     // Refresh the current view to include the new task
     fetchTasks();
     setShowCreateForm(false);
@@ -75,7 +75,7 @@ export default function ViewsPage() {
     setSelectedTask(updatedTask);
   };
 
-  const handleTaskDeleted = (taskId: number) => {
+  const handleTaskDeleted = () => {
     // Refresh the current view to remove deleted task
     fetchTasks();
     setSelectedTask(null);
@@ -191,5 +191,13 @@ export default function ViewsPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function ViewsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-64">Loading views...</div>}>
+      <ViewsPageContent />
+    </Suspense>
   );
 }

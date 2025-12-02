@@ -3,10 +3,28 @@ import { DatabaseError } from '@/lib/errors';
 import { View, CreateViewInput, UpdateViewInput, ViewService as IViewService } from '@/types/view-types';
 import { TaskService } from './task-service';
 
+// For testing, we need to use the mockPrisma from tests
+// This allows tests to properly mock the database
+let db: any
+
+// Check if we're in a test environment and use mockPrisma if available
+if (process.env.NODE_ENV === 'test') {
+  try {
+    const { mockPrisma } = require('../../tests/mocks/mock-db')
+    db = mockPrisma
+    console.log('Using mockPrisma for testing')
+  } catch (error) {
+    console.warn('mockPrisma not available, using mockDb')
+    db = mockDb
+  }
+} else {
+  db = mockDb
+}
+
 export class ViewService implements IViewService {
   async getAllViews(userId: number): Promise<View[]> {
     try {
-      const views = await mockDb.view.findMany({
+      const views = await db.view.findMany({
         where: {
           user_id: userId
         }
@@ -21,7 +39,7 @@ export class ViewService implements IViewService {
 
   async getViewById(id: number, userId: number): Promise<View | null> {
     try {
-      const view = await mockDb.view.findUnique({
+      const view = await db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -46,7 +64,7 @@ export class ViewService implements IViewService {
         throw new Error('Invalid view type');
       }
 
-      const newView = await mockDb.view.create({
+      const newView = await db.view.create({
         data: {
           user_id: userId,
           name: data.name.trim(),
@@ -70,7 +88,7 @@ export class ViewService implements IViewService {
   async updateView(id: number, userId: number, data: UpdateViewInput): Promise<View> {
     try {
       // Get the current view to check if it exists
-      const currentView = await mockDb.view.findUnique({
+      const currentView = await db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -90,7 +108,7 @@ export class ViewService implements IViewService {
         throw new Error('Invalid view type');
       }
 
-      const updatedView = await mockDb.view.update({
+      const updatedView = await db.view.update({
         where: {
           id: id,
           user_id: userId
@@ -104,6 +122,10 @@ export class ViewService implements IViewService {
           updated_at: new Date()
         }
       });
+
+      if (!updatedView) {
+        throw new DatabaseError('View update failed - view not found', 'VIEW_UPDATE_FAILED');
+      }
 
       return updatedView;
     } catch (error) {
@@ -121,7 +143,7 @@ export class ViewService implements IViewService {
   async deleteView(id: number, userId: number): Promise<void> {
     try {
       // Get the view to check if it exists
-      const view = await mockDb.view.findUnique({
+      const view = await db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -132,7 +154,7 @@ export class ViewService implements IViewService {
         throw new DatabaseError('View not found', 'VIEW_NOT_FOUND');
       }
 
-      await mockDb.view.delete({
+      await db.view.delete({
         where: {
           id: id,
           user_id: userId
@@ -147,7 +169,7 @@ export class ViewService implements IViewService {
     }
   }
 
-  async getViewTasks(viewId: number, userId: number): Promise<any[]> {
+  async getViewTasks(viewId: number, userId: number): Promise<Task[]> {
     try {
       const view = await this.getViewById(viewId, userId);
       if (!view) {
@@ -155,23 +177,22 @@ export class ViewService implements IViewService {
       }
 
       const taskService = new TaskService();
+      const { startOfToday, endOfToday, addDays } = await import('date-fns');
+      const todayEnd = endOfToday();
 
       // Get tasks based on view type and filter criteria
       switch (view.type) {
         case 'day':
           // For day views, get tasks for today
-          const { startOfToday, endOfToday } = await import('date-fns');
           const todayTasks = await taskService.getTasksByDateRange(
             userId,
             startOfToday(),
-            endOfToday()
+            todayEnd
           );
           return this.applyViewFilters(todayTasks, view);
 
         case 'week':
           // For week views, get tasks for next 7 days
-          const { addDays } = await import('date-fns');
-          const todayEnd = endOfToday();
           const weekEnd = addDays(todayEnd, 7);
           const weekTasks = await taskService.getTasksByDateRange(
             userId,
@@ -221,7 +242,7 @@ export class ViewService implements IViewService {
     }
   }
 
-  private async applyViewFilters(tasks: any[], view: View): Promise<any[]> {
+  private async applyViewFilters(tasks: Task[], view: View): Promise<Task[]> {
     let filteredTasks = [...tasks];
 
     // Apply filter criteria if specified
@@ -267,8 +288,8 @@ export class ViewService implements IViewService {
 
         if (sortOrder.field && sortOrder.direction) {
           filteredTasks.sort((a, b) => {
-            const fieldA = a[sortOrder.field];
-            const fieldB = b[sortOrder.field];
+            const fieldA = a[sortOrder.field as keyof Task];
+            const fieldB = b[sortOrder.field as keyof Task];
 
             if (fieldA === undefined || fieldB === undefined) return 0;
 

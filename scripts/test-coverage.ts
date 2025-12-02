@@ -1,16 +1,14 @@
 #!/usr/bin/env bun
-import { $ } from 'bun'
-import { writeFileSync } from 'fs'
-import { join } from 'path'
+import { execSync } from 'child_process'
 
 async function generateCoverageReport() {
   console.log('📊 Generating test coverage report...')
 
   try {
     // Run tests with coverage
-    const result = await $`bun test --coverage`.quiet()
-
-    if (result.exitCode !== 0) {
+    try {
+      execSync('bun test --coverage', { stdio: 'inherit' })
+    } catch {
       console.error('❌ Coverage generation failed!')
       process.exit(1)
     }
@@ -19,12 +17,17 @@ async function generateCoverageReport() {
 
     // Generate HTML report
     console.log('📄 Generating HTML coverage report...')
-    await $`bun run coverage:html`.quiet()
+    try {
+      execSync('bun run coverage:html', { stdio: 'inherit' })
+    } catch {
+      console.error('❌ HTML coverage generation failed!')
+      process.exit(1)
+    }
 
     console.log('🎉 Coverage report completed!')
 
-  } catch (error) {
-    console.error('💥 Error generating coverage report:', error)
+  } catch {
+    console.error('💥 Error generating coverage report')
     process.exit(1)
   }
 }

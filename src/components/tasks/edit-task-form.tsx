@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Task, TaskLabel, TaskAttachment } from '@/types/task-types';
+import { Task, TaskLabel } from '@/types/task-types';
 import { format } from 'date-fns';
 
 interface EditTaskFormProps {
@@ -62,7 +62,7 @@ export function EditTaskForm({ taskId, isOpen, onClose, onTaskUpdated }: EditTas
       setStatus(data.status || 'pending');
       setRecurring(data.recurring || '');
       setReminders(data.reminders || []);
-      setLabels(data.task_labels?.map(label => ({
+      setLabels(data.task_labels?.map((label: TaskLabel) => ({
         name: label.name,
         color: label.color,
         icon: label.icon

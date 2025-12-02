@@ -17,7 +17,6 @@ export function ListManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingList, setEditingList] = useState<List | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     fetchLists();

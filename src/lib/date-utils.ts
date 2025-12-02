@@ -152,7 +152,7 @@ export function getDateRangeForApi(type: string): {
   end?: string
 } {
   const today = new Date()
-  const { start, end } = getDateRange(type as any, today)
+  const { start, end } = getDateRange(type as 'day' | 'week' | 'month' | 'custom', today)
 
   return {
     start: start.toISOString(),

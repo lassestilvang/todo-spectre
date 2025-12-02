@@ -18,7 +18,7 @@ function setupPerformanceObservers() {
   // Navigation timing observer
   const navigationObserver = new PerformanceObserver((list) => {
     const entries = list.getEntriesByType('navigation')
-    entries.forEach((entry: any) => {
+    entries.forEach((entry: PerformanceNavigationTiming) => {
       console.log('Navigation timing:', {
         domainLookup: entry.domainLookupEnd - entry.domainLookupStart,
         connect: entry.connectEnd - entry.connectStart,
@@ -33,7 +33,7 @@ function setupPerformanceObservers() {
   // Resource timing observer
   const resourceObserver = new PerformanceObserver((list) => {
     const entries = list.getEntriesByType('resource')
-    entries.forEach((entry: any) => {
+    entries.forEach((entry: PerformanceResourceTiming) => {
       if (entry.duration > 1000) {
         console.warn('Slow resource:', {
           name: entry.name,
@@ -47,7 +47,7 @@ function setupPerformanceObservers() {
   // Paint timing observer
   const paintObserver = new PerformanceObserver((list) => {
     const entries = list.getEntriesByType('paint')
-    entries.forEach((entry: any) => {
+    entries.forEach((entry: PerformanceEntry) => {
       console.log('Paint timing:', {
         name: entry.name,
         startTime: entry.startTime,
@@ -68,7 +68,7 @@ export function usePerformanceOptimization() {
 }
 
 // Memoization utilities
-export function useOptimizedMemo<T>(factory: () => T, deps: any[]): T {
+export function useOptimizedMemo<T>(factory: () => T, deps: unknown[]): T {
   return useMemo(() => {
     const start = performance.now()
     const result = factory()
@@ -83,15 +83,15 @@ export function useOptimizedMemo<T>(factory: () => T, deps: any[]): T {
 }
 
 // Callback optimization
-export function useOptimizedCallback<T extends (...args: any[]) => any>(
+export function useOptimizedCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
-  deps: any[]
+  deps: unknown[]
 ): T {
   return useCallback(callback, deps)
 }
 
 // Debounce utility
-export function debounce<T extends (...args: any[]) => void>(
+export function debounce<T extends (...args: unknown[]) => void>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -109,7 +109,7 @@ export function debounce<T extends (...args: any[]) => void>(
 }
 
 // Throttle utility
-export function throttle<T extends (...args: any[]) => void>(
+export function throttle<T extends (...args: unknown[]) => void>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -204,7 +204,7 @@ export function collectPerformanceMetrics() {
 }
 
 function getNavigationMetrics() {
-  const [navigationEntry] = performance.getEntriesByType('navigation')
+  const [navigationEntry] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
   if (!navigationEntry) return null
 
   return {
@@ -218,7 +218,7 @@ function getNavigationMetrics() {
 }
 
 function getResourceMetrics() {
-  const resourceEntries = performance.getEntriesByType('resource')
+  const resourceEntries = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
   return resourceEntries.map(entry => ({
     name: entry.name,
     duration: entry.duration,
@@ -238,11 +238,17 @@ function getPaintMetrics() {
 }
 
 function getMemoryMetrics() {
-  if (typeof performance.memory === 'undefined') return null
+  if (typeof (performance as any).memory === 'undefined') return null
+
+  const memory = (performance as any).memory as {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
 
   return {
-    usedJSHeapSize: performance.memory.usedJSHeapSize,
-    totalJSHeapSize: performance.memory.totalJSHeapSize,
-    jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
+    usedJSHeapSize: memory.usedJSHeapSize,
+    totalJSHeapSize: memory.totalJSHeapSize,
+    jsHeapSizeLimit: memory.jsHeapSizeLimit,
   }
 }

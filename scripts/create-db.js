@@ -1,5 +1,5 @@
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
+import sqlite3 from 'sqlite3';
+import fs from 'fs';
 
 // Create database file if it doesn't exist
 const dbFile = './dev.db';

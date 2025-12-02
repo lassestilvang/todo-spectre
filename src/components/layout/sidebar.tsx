@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { ListManagement } from '@/components/lists/list-management';
 
 export function Sidebar() {
   const pathname = usePathname();

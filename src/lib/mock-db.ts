@@ -4,7 +4,7 @@ import { Task, TaskLog, TaskLabel, TaskAttachment } from '@/types/task-types';
 import { View } from '@/types/view-types';
 
 // Module-level database state
-let mockLists: List[] = [
+const mockLists: List[] = [
   {
     id: 1,
     user_id: 1,
@@ -16,11 +16,11 @@ let mockLists: List[] = [
   }
 ];
 
-let mockTasks: Task[] = [];
+const mockTasks: Task[] = [];
 let mockTaskLogs: TaskLog[] = [];
 let mockTaskLabels: TaskLabel[] = [];
 let mockTaskAttachments: TaskAttachment[] = [];
-let mockViews: View[] = [];
+const mockViews: View[] = [];
 
 let nextListId = 2;
 let nextTaskId = 1;
@@ -31,13 +31,13 @@ let nextViewId = 1;
 
 export const mockDb = {
   list: {
-    findMany: async (options: any) => {
+    findMany: async (options: { where: { user_id: number } }) => {
       return mockLists.filter(list => list.user_id === options.where.user_id);
     },
-    findUnique: async (options: any) => {
+    findUnique: async (options: { where: { id: number; user_id: number } }) => {
       return mockLists.find(list => list.id === options.where.id && list.user_id === options.where.user_id) || null;
     },
-    findFirst: async (options: any) => {
+    findFirst: async (options: { where: { title: string; user_id: number } }) => {
       return mockLists.find(list => list.title === options.where.title && list.user_id === options.where.user_id) || null;
     },
     create: async (options: any) => {
@@ -74,7 +74,7 @@ export const mockDb = {
     }
   },
   task: {
-    findMany: async (options: any) => {
+    findMany: async (options: { where?: { list?: { id: number }; status?: string; priority?: number; list_id?: number }; include?: { task_logs?: boolean; task_labels?: boolean; task_attachments?: boolean }; orderBy?: any }) => {
       let tasks = [...mockTasks];
 
       // Apply where conditions
@@ -117,8 +117,8 @@ export const mockDb = {
           const direction = options.orderBy[field];
 
           if (field === 'created_at' || field === 'due_date') {
-            const dateA = new Date(a[field]).getTime();
-            const dateB = new Date(b[field]).getTime();
+            const dateA = a[field] ? new Date(a[field]).getTime() : 0;
+            const dateB = b[field] ? new Date(b[field]).getTime() : 0;
             return direction === 'desc' ? dateB - dateA : dateA - dateB;
           }
           return 0;

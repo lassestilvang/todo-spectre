@@ -22,7 +22,7 @@ async function runMigrations() {
     try {
       execSync('bunx prisma migrate dev --name init', { stdio: 'inherit' })
       console.log('Migrations completed successfully')
-    } catch (migrationError) {
+    } catch {
       console.error('Migration failed, trying reset...')
       execSync('bunx prisma migrate reset --force', { stdio: 'inherit' })
       execSync('bunx prisma migrate dev --name init', { stdio: 'inherit' })
@@ -39,8 +39,8 @@ async function runMigrations() {
     }
 
     console.log('Database migration process completed successfully')
-  } catch (error) {
-    console.error('Database migration failed:', error)
+  } catch {
+    console.error('Database migration failed')
     process.exit(1)
   } finally {
     await prisma.$disconnect()

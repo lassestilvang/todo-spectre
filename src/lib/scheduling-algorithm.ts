@@ -1,5 +1,3 @@
-'use server';
-
 import { DateTime } from 'luxon';
 import { Task } from '@/types/task-types';
 

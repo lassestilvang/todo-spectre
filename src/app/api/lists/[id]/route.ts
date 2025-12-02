@@ -5,7 +5,7 @@ import { DatabaseError } from '@/lib/errors';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -16,9 +16,10 @@ export async function GET(
       );
     }
 
+    const paramsObj = await params;
     const listService = new ListService();
     const list = await listService.getListById(
-      Number(params.id),
+      Number(paramsObj.id),
       Number(session.user.id)
     );
 

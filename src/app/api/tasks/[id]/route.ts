@@ -5,7 +5,7 @@ import { DatabaseError } from '@/lib/errors';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -17,8 +17,8 @@ export async function GET(
     }
 
     // Extract task ID from URL
-    const url = new URL(request.url);
-    const taskId = Number(url.pathname.split('/').pop());
+    const paramsObj = await params;
+    const taskId = Number(paramsObj.id);
 
     const taskService = new TaskService();
     const task = await taskService.getTaskById(

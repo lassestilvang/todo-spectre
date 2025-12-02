@@ -21,16 +21,16 @@ export const SECURITY_CONFIG = {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   },
-}
+} as const
 
 // Authentication utilities
 export function createJWTToken(payload: object, expiresIn: string = '1h'): string {
-  return sign(payload, SECURITY_CONFIG.JWT_SECRET, { expiresIn })
+  return sign(payload, SECURITY_CONFIG.JWT_SECRET as string, { expiresIn })
 }
 
-export function verifyJWTToken(token: string): any {
+export function verifyJWTToken(token: string): unknown {
   try {
-    return verify(token, SECURITY_CONFIG.JWT_SECRET)
+    return verify(token, SECURITY_CONFIG.JWT_SECRET as string, {})
   } catch (error) {
     console.error('JWT verification failed:', error)
     return null
@@ -152,7 +152,7 @@ export function sanitizeInput(input: string): string {
     .replace(/</g, '<')
     .replace(/>/g, '>')
     .replace(/"/g, '"')
-    .replace(/'/g, ''')
+    .replace(/'/g, "''")
     .trim()
 }
 
@@ -205,7 +205,7 @@ export function runSecurityAudit() {
 }
 
 // Secure cookie utilities
-export function createSecureCookie(name: string, value: string, options: any = {}) {
+export function createSecureCookie(name: string, value: string, options: Record<string, unknown> = {}) {
   const cookieOptions = {
     ...SECURITY_CONFIG.COOKIE_OPTIONS,
     ...options,

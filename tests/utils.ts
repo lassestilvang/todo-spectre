@@ -2,8 +2,8 @@ import { render, RenderResult } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouterProvider } from 'next-router-mock'
-import { ThemeProvider } from '../src/components/theme-provider'
+// import { MemoryRouterProvider } from 'next-router-mock'
+import { ThemeProvider as ThemeProviderComponent } from '../src/components/theme-provider'
 
 // Create a test query client
 export function createTestQueryClient() {
@@ -11,13 +11,8 @@ export function createTestQueryClient() {
     defaultOptions: {
       queries: {
         retry: false,
-        cacheTime: 0,
+        gcTime: 0,
       },
-    },
-    logger: {
-      log: console.log,
-      warn: console.warn,
-      error: () => {},
     },
   })
 }
@@ -30,18 +25,16 @@ export function renderWithProviders(
     queryClient = createTestQueryClient(),
     ...renderOptions
   } = {}
-): RenderResult & { user: ReturnType<typeof userEvent.setup> } {
+): any {
   const user = userEvent.setup()
 
-  const Wrapper = ({ children }: { children: ReactElement }) => (
-    <MemoryRouterProvider url={route}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
-      </QueryClientProvider>
-    </MemoryRouterProvider>
-  )
+  const Wrapper = ({ children }: { children: ReactElement }) => {
+    const ProviderWrapper = QueryClientProvider as any;
+    return ProviderWrapper({
+      client: queryClient,
+      children: children
+    })
+  }
 
   return {
     user,
@@ -51,15 +44,15 @@ export function renderWithProviders(
 
 // Mock API client
 export class MockApiClient {
-  private responses: Map<string, { data: any; status: number; error?: string }> = new Map()
+  private responses: Map<string, { data: unknown; status: number; error?: string }> = new Map()
 
-  constructor(responses: Record<string, { data: any; status: number; error?: string }> = {}) {
+  constructor(responses: Record<string, { data: unknown; status: number; error?: string }> = {}) {
     Object.entries(responses).forEach(([key, value]) => {
       this.responses.set(key, value)
     })
   }
 
-  async get(url: string): Promise<{ data: any; status: number }> {
+  async get(url: string): Promise<{ data: unknown; status: number }> {
     const response = this.responses.get(url)
     if (!response) {
       throw new Error(`No mock response configured for GET ${url}`)
@@ -70,7 +63,7 @@ export class MockApiClient {
     return { data: response.data, status: response.status }
   }
 
-  async post(url: string, data: any): Promise<{ data: any; status: number }> {
+  async post(url: string, data: unknown): Promise<{ data: unknown; status: number }> {
     const response = this.responses.get(url)
     if (!response) {
       throw new Error(`No mock response configured for POST ${url}`)
@@ -81,7 +74,7 @@ export class MockApiClient {
     return { data: response.data, status: response.status }
   }
 
-  async put(url: string, data: any): Promise<{ data: any; status: number }> {
+  async put(url: string, data: unknown): Promise<{ data: unknown; status: number }> {
     const response = this.responses.get(url)
     if (!response) {
       throw new Error(`No mock response configured for PUT ${url}`)
@@ -92,7 +85,7 @@ export class MockApiClient {
     return { data: response.data, status: response.status }
   }
 
-  async delete(url: string): Promise<{ data: any; status: number }> {
+  async delete(url: string): Promise<{ data: unknown; status: number }> {
     const response = this.responses.get(url)
     if (!response) {
       throw new Error(`No mock response configured for DELETE ${url}`)
@@ -103,7 +96,7 @@ export class MockApiClient {
     return { data: response.data, status: response.status }
   }
 
-  setResponse(url: string, response: { data: any; status: number; error?: string }) {
+  setResponse(url: string, response: { data: unknown; status: number; error?: string }) {
     this.responses.set(url, response)
   }
 

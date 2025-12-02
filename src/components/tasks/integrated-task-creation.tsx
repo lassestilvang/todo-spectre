@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NaturalLanguageTaskForm } from './natural-language-task-form';
 import { CreateTaskForm } from './create-task-form';
 import { SchedulingSuggestions } from './scheduling-suggestions';
 import { Task } from '@/types/task-types';
 import { ScheduleSuggestion } from '@/lib/scheduling-algorithm';
-import { UserPreferenceLearning } from '@/lib/user-preference-learning';
+import { getUserPreferences, recordUserAction } from '@/lib/user-preference-learning';
 import { StretchFeaturesConfig } from '@/config/stretch-features-config';
 
 interface IntegratedTaskCreationProps {
@@ -20,7 +20,6 @@ interface IntegratedTaskCreationProps {
 
 export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: IntegratedTaskCreationProps) {
   const [activeTab, setActiveTab] = useState<'form' | 'natural' | 'scheduling'>('form');
-  const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
   const [parsedTaskData, setParsedTaskData] = useState<Partial<Task> | null>(null);
   const [schedulingSuggestions, setSchedulingSuggestions] = useState<ScheduleSuggestion[]>([]);
   const [selectedSuggestion, setSelectedSuggestion] = useState<ScheduleSuggestion | null>(null);
@@ -32,7 +31,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
   useEffect(() => {
     const loadPreferences = async () => {
       try {
-        const preferences = await UserPreferenceLearning.getUserPreferences(1); // User ID 1 for demo
+        const preferences = await getUserPreferences(1); // User ID 1 for demo
         console.log('Loaded user preferences:', preferences);
       } catch (err) {
         console.error('Error loading preferences:', err);
@@ -66,10 +65,9 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
 
       const result = await response.json();
       setParsedTaskData(result.parsed_data);
-      setNaturalLanguageInput(input);
 
       // Record user action for learning
-      await UserPreferenceLearning.recordUserAction(1, 'task_created', {
+      await recordUserAction(1, 'task_created', {
         time_of_day: getTimeOfDayCategory(),
         duration: result.parsed_data.estimate || 30
       });
@@ -114,7 +112,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
     setSelectedSuggestion(suggestion);
 
     // Record scheduling acceptance for learning
-    UserPreferenceLearning.recordUserAction(1, 'scheduling_accepted', {
+    recordUserAction(1, 'scheduling_accepted', {
       time_slot: suggestion.start_time.toISOString()
     });
   };
@@ -184,7 +182,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
         Choose how you want to create your task
       </p>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="mb-4">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'form' | 'natural' | 'scheduling')} className="mb-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="form">Standard Form</TabsTrigger>
           <TabsTrigger value="natural">Natural Language</TabsTrigger>
@@ -217,7 +215,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
             onTaskCreated={(task) => {
               onTaskCreated(task);
               // Record the natural language usage
-              UserPreferenceLearning.recordUserAction(1, 'task_created', {
+              recordUserAction(1, 'task_created', {
                 method: 'natural_language',
                 time_of_day: getTimeOfDayCategory()
               });
@@ -250,7 +248,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
                 {parsedTaskData.priority && (
                   <div>
                     <p className="text-gray-600">Priority</p>
-                    <p className="font-medium">{this.getPriorityLabel(parsedTaskData.priority)}</p>
+                    <p className="font-medium">{getPriorityLabel(parsedTaskData.priority)}</p>
                   </div>
                 )}
                 {parsedTaskData.estimate && (

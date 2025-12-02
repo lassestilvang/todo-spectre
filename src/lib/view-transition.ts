@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 // View transition types
@@ -75,11 +75,11 @@ function applyViewTransitionStyles(config: ViewTransitionConfig) {
     }
 
     ::view-transition-old(root) {
-      ${getTransitionStyle(config.type, 'old')}
+      ${getTransitionStyle(config.type || 'fade', 'old')}
     }
 
     ::view-transition-new(root) {
-      ${getTransitionStyle(config.type, 'new')}
+      ${getTransitionStyle(config.type || 'fade', 'new')}
     }
   `
 
@@ -116,7 +116,7 @@ export function ViewTransitionWrapper({
   config?: ViewTransitionConfig
 }) {
   useViewTransition(config)
-  return <>{children}</>
+  return React.createElement(React.Fragment, null, children)
 }
 
 // Check if view transitions are supported
@@ -133,13 +133,11 @@ export function withViewTransitionFallback(
     const { isSupported } = useViewTransition()
 
     if (!isSupported) {
-      return <Component {...props} />
+      return React.createElement(Component, props)
     }
 
     return (
-      <ViewTransitionWrapper config={fallbackConfig}>
-        <Component {...props} />
-      </ViewTransitionWrapper>
+      React.createElement(ViewTransitionWrapper, { config: fallbackConfig, children: React.createElement(Component, props) })
     )
   }
 }

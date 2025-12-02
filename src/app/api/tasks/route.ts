@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const filters: any = {};
+    const filters: Record<string, unknown> = {};
 
     // Parse query parameters for filtering
     if (searchParams.has('status')) {

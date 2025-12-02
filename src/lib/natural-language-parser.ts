@@ -1,5 +1,3 @@
-'use server';
-
 import { DateTime } from 'luxon';
 import { Task } from '@/types/task-types';
 
@@ -98,7 +96,7 @@ export class NaturalLanguageParser {
   /**
    * Extract priority from text
    */
-  private static extractPriority(text: string): number | null {
+  private static extractPriority(text: string): number {
     const lowerText = text.toLowerCase();
 
     // Check for high priority keywords

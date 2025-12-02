@@ -6,17 +6,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Slider } from '@/components/ui/slider';
 import { Filter, X } from 'lucide-react';
 
 interface SearchFiltersProps {
-  onFilterChange: (filters: any) => void;
-  currentFilters: any;
+  onFilterChange: (filters: Record<string, unknown>) => void;
+  currentFilters: Record<string, unknown>;
 }
 
 export function SearchFilters({ onFilterChange, currentFilters }: SearchFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [localFilters, setLocalFilters] = useState(currentFilters);
+  const [localFilters, setLocalFilters] = useState<Record<string, unknown>>(currentFilters);
 
   const handleApplyFilters = () => {
     onFilterChange(localFilters);

@@ -11,11 +11,7 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchTask();
-  }, [params.id]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/tasks/${params.id}`);
@@ -30,7 +26,11 @@ export default function EditTaskPage({ params }: { params: { id: string } }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchTask();
+  }, [fetchTask]);
 
   const handleTaskUpdated = (updatedTask: Task) => {
     setTask(updatedTask);

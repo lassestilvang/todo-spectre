@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { ViewService } from '@/services/view-service';
 import { DatabaseError } from '@/lib/errors';
 
-export async function PUT(request: Request, { params }: { params: { viewName: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ viewName: string }> }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -17,8 +17,9 @@ export async function PUT(request: Request, { params }: { params: { viewName: st
     const viewService = new ViewService();
 
     // Find the view by name and user
+    const paramsObj = await params;
     const views = await viewService.getAllViews(Number(session.user.id));
-    const view = views.find(v => v.name.toLowerCase() === params.viewName.toLowerCase());
+    const view = views.find(v => v.name.toLowerCase() === paramsObj.viewName.toLowerCase());
 
     if (!view) {
       return NextResponse.json(

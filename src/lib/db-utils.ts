@@ -31,7 +31,7 @@ export async function executeWithDatabaseErrorHandling<T>(
   context: Record<string, unknown> = {}
 ): Promise<T> {
   try {
-    return await prisma.executeWithErrorHandling(operation)
+    return await operation()
   } catch (error) {
     // Convert Prisma errors to our standard format
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -164,7 +164,8 @@ export async function getDatabaseHealth(): Promise<{
 
     for (const table of mainTables) {
       try {
-        const count = await prisma[table.toLowerCase() as keyof typeof prisma].count()
+        const model = prisma[table.toLowerCase() as keyof typeof prisma] as unknown;
+        const count = await (model as { count: () => Promise<number> }).count()
         recordCounts[table] = count
       } catch (countError) {
         recordCounts[table] = 0

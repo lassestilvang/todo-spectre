@@ -94,7 +94,7 @@ export function SchedulingSuggestions({
           <LoadingSpinner className="h-8 w-8" />
         </div>
       ) : error ? (
-        <ErrorDisplay message={error} />
+        <ErrorDisplay error={error} />
       ) : suggestions.length === 0 ? (
         <p className="text-gray-500">No scheduling suggestions available</p>
       ) : (

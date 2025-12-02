@@ -1,4 +1,5 @@
-import { Task, List } from './task-types';
+import { Task } from './task-types';
+import { List } from './list-types';
 
 export interface SearchResult {
   items: (Task | List)[];

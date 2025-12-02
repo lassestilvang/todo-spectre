@@ -5,11 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { SearchInput } from './search-input';
 import { SearchResults } from './search-results';
 import { SearchFilters } from './search-filters';
-import { Button } from '@/components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
-import { Task, List } from '@/types/task-types';
+import { Task } from '@/types/task-types';
+import { List } from '@/types/list-types';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/context/search-context';
+import { trackSearch, trackSearchResultClick } from '@/lib/search-analytics';
 
 export function SearchModal() {
   const { isSearchOpen, closeSearch } = useSearch();
@@ -17,7 +18,7 @@ export function SearchModal() {
   const [searchResults, setSearchResults] = useState<(Task | List)[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Record<string, string | number | boolean>>({});
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
@@ -108,7 +109,7 @@ export function SearchModal() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen, searchResults, selectedResultIndex, closeSearch]);
+  }, [isSearchOpen, searchResults, selectedResultIndex, closeSearch, handleResultClick, setSelectedResultIndex]);
 
   // Scroll selected result into view
   useEffect(() => {
@@ -186,12 +187,10 @@ export function SearchModal() {
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
+                    onClick={() => {
                       if (page > 1) handlePageChange(page - 1);
                     }}
-                    isActive={page > 1}
+                    disabled={page <= 1}
                   />
                 </PaginationItem>
 
@@ -200,9 +199,7 @@ export function SearchModal() {
                   return (
                     <PaginationItem key={pageNum}>
                       <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
+                        onClick={() => {
                           handlePageChange(pageNum);
                         }}
                         isActive={pageNum === page}
@@ -215,12 +212,10 @@ export function SearchModal() {
 
                 <PaginationItem>
                   <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
+                    onClick={() => {
                       if (page < totalPages) handlePageChange(page + 1);
                     }}
-                    isActive={page < totalPages}
+                    disabled={page >= totalPages}
                   />
                 </PaginationItem>
               </PaginationContent>

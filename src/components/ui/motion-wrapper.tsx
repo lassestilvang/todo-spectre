@@ -23,7 +23,6 @@ export function MotionWrapper({
       transition: {
         delay,
         duration: 0.3,
-        ease: 'easeInOut',
       },
     },
   };

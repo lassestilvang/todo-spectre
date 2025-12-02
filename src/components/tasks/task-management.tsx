@@ -7,7 +7,7 @@ import { TaskList } from './task-list';
 import { CreateTaskForm } from './create-task-form';
 import { TaskDetailView } from './task-detail-view';
 import { Task } from '@/types/task-types';
-import { format, addDays, startOfToday, endOfToday, startOfWeek, endOfWeek } from 'date-fns';
+import { format, addDays, startOfToday, endOfToday } from 'date-fns';
 
 export function TaskManagement() {
   const [tasks, setTasks] = useState<Task[]>([]);

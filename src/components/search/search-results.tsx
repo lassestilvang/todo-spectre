@@ -1,9 +1,9 @@
 'use client';
 
-import { Task, List } from '@/types/task-types';
+import { Task } from '@/types/task-types';
+import { List } from '@/types/list-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Clock, List as ListIcon, Tag, Calendar, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -19,7 +19,8 @@ export function SearchResults({
   results,
   isLoading,
   error,
-  onResultClick
+  onResultClick,
+  selectedIndex = -1
 }: SearchResultsProps) {
   if (isLoading) {
     return (
@@ -107,7 +108,7 @@ export function SearchResults({
               {result.hasOwnProperty('due_date') && (result as Task).due_date && (
                 <Badge variant="outline" className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  Due: {new Date((result as Task).due_date).toLocaleDateString()}
+                  Due: {new Date((result as Task).due_date!).toLocaleDateString()}
                 </Badge>
               )}
 

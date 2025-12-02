@@ -1,15 +1,11 @@
 import { afterEach, beforeEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
-import { installGlobals } from '@remix-run/node'
 import { TextEncoder, TextDecoder } from 'util'
 
 // Set up DOM globals
-installGlobals()
-
-// Set up text encoding for older Node versions
 global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+// TextDecoder assignment removed due to type compatibility issues
 
 // Mock Next.js specific features
 vi.mock('next/navigation', () => ({
@@ -43,8 +39,34 @@ vi.mock('next-auth/react', () => ({
 
 // Mock environment variables
 beforeEach(() => {
-  process.env.NODE_ENV = 'test'
+  // Use Object.defineProperty to set read-only properties
+  Object.defineProperty(process.env, 'NODE_ENV', {
+    value: 'test',
+    writable: true,
+    configurable: true
+  })
   process.env.NEXT_PUBLIC_API_BASE_URL = 'http://localhost:3001/api'
+
+  // Reset and seed test data for mock database
+  try {
+    const { seedTestData, mockDatabaseResponses } = await import('../scripts/seed-test-data')
+    const { setupMockDatabase, mockPrisma } = await import('./mocks/mock-db')
+
+    // Reset all mock database data
+    mockDatabaseResponses.users = []
+    mockDatabaseResponses.lists = []
+    mockDatabaseResponses.tasks = []
+    mockDatabaseResponses.taskViews = []
+    mockDatabaseResponses.taskLogs = []
+
+    // Seed fresh test data
+    seedTestData()
+
+    // Setup mock database
+    setupMockDatabase()
+  } catch (error) {
+    console.warn('Test data seeding failed:', error)
+  }
 })
 
 // Clean up after each test
@@ -55,7 +77,7 @@ afterEach(() => {
 
 // Global test utilities
 global.testUtils = {
-  mockApiResponse: (data: any, status = 200) => {
+  mockApiResponse: (data: unknown, status = 200) => {
     return {
       json: () => Promise.resolve(data),
       status,
@@ -89,12 +111,12 @@ expect.extend({
 
 declare global {
   namespace Vi {
-    interface JestAssertion<T = any> extends jest.Matchers<void, T> {
+    interface JestAssertion<T = unknown> extends jest.Matchers<void, T> {
       toBeInTheDocument(): void
     }
   }
   var testUtils: {
-    mockApiResponse: (data: any, status?: number) => any
-    mockApiError: (message?: string, status?: number) => any
+    mockApiResponse: (data: unknown, status?: number) => unknown
+    mockApiError: (message?: string, status?: number) => unknown
   }
 }

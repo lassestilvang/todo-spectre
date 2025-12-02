@@ -21,7 +21,7 @@ export function NaturalLanguageTaskForm({ isOpen, onClose, onTaskCreated, listId
   const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [parsedData, setParsedData] = useState<any>(null);
+  const [parsedData, setParsedData] = useState<Record<string, unknown> | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,13 +81,13 @@ export function NaturalLanguageTaskForm({ isOpen, onClose, onTaskCreated, listId
               id="natural-language-input"
               value={naturalLanguageInput}
               onChange={(e) => setNaturalLanguageInput(e.target.value)}
-              placeholder="Example: 'Complete the project proposal by Friday at 5pm - this is urgent and should take about 2 hours'"
+              placeholder="Example: Complete the project proposal by Friday at 5pm - this is urgent and should take about 2 hours"
               rows={6}
               className="min-h-[150px]"
               required
             />
             <p className="text-sm text-gray-500">
-              You can use natural language like: "Finish the report by tomorrow", "Schedule meeting with team next Monday at 2pm", "Buy groceries this afternoon - low priority"
+              You can use natural language like: &quot;Finish the report by tomorrow&quot;, &quot;Schedule meeting with team next Monday at 2pm&quot;, &quot;Buy groceries this afternoon - low priority&quot;
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export function NaturalLanguageTaskForm({ isOpen, onClose, onTaskCreated, listId
                 <p><strong>Title:</strong> {parsedData.title}</p>
                 {parsedData.description && <p><strong>Description:</strong> {parsedData.description}</p>}
                 {parsedData.due_date && <p><strong>Due Date:</strong> {new Date(parsedData.due_date).toLocaleString()}</p>}
-                {parsedData.priority && <p><strong>Priority:</strong> {this.getPriorityLabel(parsedData.priority)}</p>}
+                {parsedData.priority && <p><strong>Priority:</strong> {getPriorityLabel(parsedData.priority)}</p>}
                 {parsedData.estimate && <p><strong>Estimated Time:</strong> {Math.floor(parsedData.estimate / 60)} hours {parsedData.estimate % 60} minutes</p>}
                 {parsedData.reminders && parsedData.reminders.length > 0 && (
                   <p><strong>Reminders:</strong> {parsedData.reminders.join(', ')}</p>
@@ -108,7 +108,7 @@ export function NaturalLanguageTaskForm({ isOpen, onClose, onTaskCreated, listId
           )}
 
           {error && (
-            <ErrorDisplay message={error} />
+            <ErrorDisplay error={error} />
           )}
 
           <DialogFooter>

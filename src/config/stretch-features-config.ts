@@ -1,5 +1,3 @@
-'use server';
-
 /**
  * Stretch Features Configuration
  * Central configuration for natural language and smart scheduling features

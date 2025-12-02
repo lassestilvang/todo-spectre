@@ -48,17 +48,6 @@ export const productionConfig: NextConfig = {
     },
   ],
 
-  // Caching strategies
-  cache: {
-    staticFiles: {
-      maxAge: 31536000, // 1 year
-      immutable: true,
-    },
-    apiRoutes: {
-      maxAge: 300, // 5 minutes
-      staleWhileRevalidate: 600, // 10 minutes
-    },
-  },
 
   // Image optimization
   images: {
@@ -78,32 +67,7 @@ export const productionConfig: NextConfig = {
     SESSION_SECRET: process.env.SESSION_SECRET,
   },
 
-  // Monitoring configuration
-  monitoring: {
-    sentry: {
-      dsn: process.env.SENTRY_DSN,
-      environment: 'production',
-      tracesSampleRate: 0.2,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0,
-    },
-    logging: {
-      level: 'info',
-      console: true,
-      file: './logs/app.log',
-    },
-  },
 
-  // Performance settings
-  performance: {
-    fonts: {
-      preload: true,
-      display: 'swap',
-    },
-    scripts: {
-      strategy: 'afterInteractive',
-    },
-  },
 };
 
 export default productionConfig;

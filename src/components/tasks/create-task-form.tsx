@@ -8,10 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Task } from '@/types/task-types';
-import { format } from 'date-fns';
-import { FormValidation, FormField } from '@/components/ui/form-validation';
-import { DatePicker } from '@/components/ui/date-picker';
+import { Task, TaskLabel } from '@/types/task-types';
+import { useRouter } from 'next/navigation';
 
 interface CreateTaskFormProps {
   isOpen: boolean;
@@ -228,7 +226,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField error={formErrors.dueDate}>
+            <div className={formErrors.dueDate ? 'border-destructive' : ''}>
               <Label htmlFor="dueDate">Due Date</Label>
               <Input
                 id="dueDate"
@@ -237,7 +235,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
                 onChange={(e) => setDueDate(e.target.value)}
                 className={formErrors.dueDate ? 'border-destructive' : ''}
               />
-            </FormField>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="deadline">Deadline</Label>

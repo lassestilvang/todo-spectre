@@ -1,18 +1,46 @@
 import { execSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
-import { deployConfig } from '../deploy.config'
+import deployConfig from '../deploy.config'
+
+// Type for the deploy config
+type DeployConfig = {
+  targets: {
+    [key: string]: {
+      provider: string
+      name: string
+      script: string
+      env?: {
+        [key: string]: {
+          [key: string]: string
+        }
+      }
+    }
+  }
+  build?: {
+    command: string
+    output: string
+    basePath: string
+    assetPrefix: string
+    cleanUrls: boolean
+    trailingSlash: boolean
+  }
+  env?: {
+    [key: string]: string
+  }
+}
 
 async function deploy(target: string = 'vercel', environment: string = 'production') {
   console.log(`Starting deployment to ${target} (${environment})...`)
 
   try {
     // Validate target
-    if (!deployConfig.targets[target]) {
+    const config = deployConfig as unknown as DeployConfig
+    if (!config.targets[target]) {
       throw new Error(`Unknown deployment target: ${target}`)
     }
 
-    const targetConfig = deployConfig.targets[target]
+    const targetConfig = config.targets[target]
 
     // Set environment variables
     console.log('Setting environment variables...')
@@ -42,15 +70,19 @@ async function deploy(target: string = 'vercel', environment: string = 'producti
 }
 
 function setEnvironmentVariables(environment: string) {
+  const config = deployConfig as unknown as DeployConfig
+
   // Set environment variables from deploy config
-  Object.entries(deployConfig.env).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      process.env[key] = value
-    }
-  })
+  if (config.env) {
+    Object.entries(config.env).forEach(([key, value]) => {
+      if (typeof value === 'string') {
+        process.env[key] = value
+      }
+    })
+  }
 
   // Set target-specific environment variables
-  Object.entries(deployConfig.targets).forEach(([targetName, targetConfig]) => {
+  Object.entries(config.targets).forEach(([, targetConfig]) => {
     if (targetConfig.env && targetConfig.env[environment]) {
       Object.entries(targetConfig.env[environment]).forEach(([key, value]) => {
         process.env[key] = value

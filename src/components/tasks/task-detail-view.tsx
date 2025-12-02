@@ -31,7 +31,7 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
       fetchTask();
       fetchTaskLogs();
     }
-  }, [taskId, isOpen]);
+  }, [taskId, isOpen, fetchTask, fetchTaskLogs]);
 
   const fetchTask = async () => {
     try {
@@ -89,7 +89,7 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
   const getPriorityBadge = (priority: number) => {
     switch (priority) {
       case 3: return <Badge variant="destructive" className="bg-red-500">High</Badge>;
-      case 2: return <Badge variant="warning" className="bg-yellow-500">Medium</Badge>;
+      case 2: return <Badge variant="secondary" className="bg-yellow-500">Medium</Badge>;
       case 1: return <Badge variant="secondary" className="bg-blue-500">Low</Badge>;
       default: return <Badge variant="outline">None</Badge>;
     }
@@ -97,8 +97,8 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'completed': return <Badge variant="success" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Completed</Badge>;
-      case 'in_progress': return <Badge variant="info" className="bg-blue-500"><AlertCircle className="w-3 h-3 mr-1" /> In Progress</Badge>;
+      case 'completed': return <Badge variant="secondary" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Completed</Badge>;
+      case 'in_progress': return <Badge variant="secondary" className="bg-blue-500"><AlertCircle className="w-3 h-3 mr-1" /> In Progress</Badge>;
       case 'archived': return <Badge variant="secondary" className="bg-gray-500"><Archive className="w-3 h-3 mr-1" /> Archived</Badge>;
       default: return <Badge variant="outline" className="bg-gray-300"><MinusCircle className="w-3 h-3 mr-1" /> Pending</Badge>;
     }
@@ -356,10 +356,10 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
                             size="sm"
                             onClick={() => {
                               try {
-                                const changes = JSON.parse(log.changes);
+                                const changes = JSON.parse(log.changes!);
                                 alert(JSON.stringify(changes, null, 2));
                               } catch (e) {
-                                alert(log.changes);
+                                alert(log.changes!);
                               }
                             }}
                           >

@@ -1,7 +1,8 @@
 import { mockDb } from '@/lib/mock-db';
 import { DatabaseError } from '@/lib/errors';
 import { SearchResult, SearchFilters } from '@/types/search-types';
-import { Task, List } from '@/types/task-types';
+import { Task } from '@/types/task-types';
+import { List } from '@/types/list-types';
 
 // Fuzzy search implementation using Levenshtein distance
 function levenshteinDistance(a: string, b: string): number {

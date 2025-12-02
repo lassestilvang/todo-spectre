@@ -83,7 +83,7 @@ export function useViewTransition() {
 
     try {
       const transition = document.startViewTransition(() => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
           await callback();
           resolve();
         });
@@ -194,10 +194,11 @@ export function getResponsiveClassName(
     lg?: string;
     xl?: string;
     '2xl'?: string;
-  }
+  },
+  breakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | null
 ) {
-  const { breakpoint } = useResponsive();
-  return `${baseClass} ${responsiveClasses[breakpoint || 'base'] || ''}`;
+  const responsiveClass = breakpoint ? responsiveClasses[breakpoint] : '';
+  return `${baseClass} ${responsiveClass || ''}`;
 }
 
 /**

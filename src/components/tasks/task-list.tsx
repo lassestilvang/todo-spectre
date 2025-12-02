@@ -1,17 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Task } from '@/types/task-types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { CheckCircle, AlertCircle, MinusCircle, Archive, Plus, Calendar, Clock, Tag } from 'lucide-react';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { SkeletonLoader } from '@/components/ui/skeleton-loader';
-import { EmptyState } from '@/components/ui/empty-state';
 
 interface TaskListProps {
   tasks: Task[];
@@ -23,18 +20,9 @@ interface TaskListProps {
   onRetry?: () => void;
 }
 
-export function TaskList({ tasks, title, onTaskClick, onRefresh }: TaskListProps) {
+export function TaskList({ tasks, title, onTaskClick, onRefresh, isLoading, error, onRetry }: TaskListProps) {
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<number | null>(null);
-  const router = useRouter();
-
-  // Reset filters when tasks change
-  useEffect(() => {
-    if (tasks.length > 0) {
-      setFilterStatus(null);
-      setFilterPriority(null);
-    }
-  }, [tasks]);
 
   const filteredTasks = tasks.filter(task => {
     if (filterStatus && task.status !== filterStatus) return false;
@@ -45,7 +33,7 @@ export function TaskList({ tasks, title, onTaskClick, onRefresh }: TaskListProps
   const getPriorityBadge = (priority: number) => {
     switch (priority) {
       case 3: return <Badge variant="destructive" className="bg-red-500">High</Badge>;
-      case 2: return <Badge variant="warning" className="bg-yellow-500">Medium</Badge>;
+      case 2: return <Badge variant="secondary" className="bg-yellow-500">Medium</Badge>;
       case 1: return <Badge variant="secondary" className="bg-blue-500">Low</Badge>;
       default: return <Badge variant="outline">None</Badge>;
     }
@@ -53,8 +41,8 @@ export function TaskList({ tasks, title, onTaskClick, onRefresh }: TaskListProps
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'completed': return <Badge variant="success" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Completed</Badge>;
-      case 'in_progress': return <Badge variant="info" className="bg-blue-500"><AlertCircle className="w-3 h-3 mr-1" /> In Progress</Badge>;
+      case 'completed': return <Badge variant="secondary" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" /> Completed</Badge>;
+      case 'in_progress': return <Badge variant="secondary" className="bg-blue-500"><AlertCircle className="w-3 h-3 mr-1" /> In Progress</Badge>;
       case 'archived': return <Badge variant="secondary" className="bg-gray-500"><Archive className="w-3 h-3 mr-1" /> Archived</Badge>;
       default: return <Badge variant="outline" className="bg-gray-300"><MinusCircle className="w-3 h-3 mr-1" /> Pending</Badge>;
     }

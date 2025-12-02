@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 
 export interface User {
   id: number;
