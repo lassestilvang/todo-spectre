@@ -2,6 +2,7 @@
 import { List } from '@/types/list-types';
 import { Task, TaskLog, TaskLabel, TaskAttachment } from '@/types/task-types';
 import { View } from '@/types/view-types';
+import { Label } from '@/types/label-types';
 
 // Module-level database state
 const mockLists: List[] = [
@@ -21,6 +22,44 @@ let mockTaskLogs: TaskLog[] = [];
 let mockTaskLabels: TaskLabel[] = [];
 let mockTaskAttachments: TaskAttachment[] = [];
 const mockViews: View[] = [];
+const mockLabels: Label[] = [
+  {
+    id: 1,
+    user_id: 1,
+    name: 'Work',
+    color: '#3b82f6',
+    icon: '💼',
+    created_at: new Date(),
+    updated_at: new Date()
+  },
+  {
+    id: 2,
+    user_id: 1,
+    name: 'Personal',
+    color: '#10b981',
+    icon: '🏠',
+    created_at: new Date(),
+    updated_at: new Date()
+  },
+  {
+    id: 3,
+    user_id: 1,
+    name: 'Important',
+    color: '#ef4444',
+    icon: '⭐',
+    created_at: new Date(),
+    updated_at: new Date()
+  },
+  {
+    id: 4,
+    user_id: 1,
+    name: 'Shopping',
+    color: '#f59e0b',
+    icon: '🛒',
+    created_at: new Date(),
+    updated_at: new Date()
+  }
+];
 
 let nextListId = 2;
 let nextTaskId = 1;
@@ -325,6 +364,48 @@ export const mockDb = {
     const index = mockViews.findIndex(view => view.id === options.where.id && view.user_id === options.where.user_id);
     if (index !== -1) {
       mockViews.splice(index, 1);
+    }
+    return {};
+  }
+},
+label: {
+  findMany: async (options: { where: { user_id: number } }) => {
+    return mockLabels.filter(label => label.user_id === options.where.user_id);
+  },
+  findUnique: async (options: { where: { id: number; user_id: number } }) => {
+    return mockLabels.find(label => label.id === options.where.id && label.user_id === options.where.user_id) || null;
+  },
+  create: async (options: any) => {
+    const labelData = options.data;
+    const newLabel: Label = {
+      id: nextLabelId++,
+      user_id: labelData.user_id,
+      name: labelData.name,
+      color: labelData.color,
+      icon: labelData.icon,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    mockLabels.push(newLabel);
+    return newLabel;
+  },
+  update: async (options: any) => {
+    const index = mockLabels.findIndex(label => label.id === options.where.id && label.user_id === options.where.user_id);
+    if (index === -1) return null;
+
+    const labelData = options.data;
+    const updatedLabel: Label = {
+      ...mockLabels[index],
+      ...labelData,
+      updated_at: new Date()
+    };
+    mockLabels[index] = updatedLabel;
+    return updatedLabel;
+  },
+  delete: async (options: any) => {
+    const index = mockLabels.findIndex(label => label.id === options.where.id && label.user_id === options.where.user_id);
+    if (index !== -1) {
+      mockLabels.splice(index, 1);
     }
     return {};
   }
