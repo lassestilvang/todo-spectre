@@ -506,15 +506,11 @@ export class TaskService implements ITaskService {
 
   async getTasksByLabel(userId: number, labelId: number): Promise<Task[]> {
     try {
+      // Get all tasks for the user
       const tasks = await db.task.findMany({
         where: {
           list: {
             user_id: userId
-          },
-          task_labels: {
-            some: {
-              label_id: labelId
-            }
           }
         },
         include: {
@@ -527,7 +523,12 @@ export class TaskService implements ITaskService {
         }
       });
 
-      return tasks;
+      // Filter tasks that have the specified label
+      const filteredTasks = tasks.filter(task => {
+        return task.task_labels.some(label => label.id === labelId);
+      });
+
+      return filteredTasks;
     } catch (error) {
       console.error('Error getting tasks by label:', error);
       throw new DatabaseError('Failed to get tasks by label', 'GET_TASKS_BY_LABEL_ERROR', error);
