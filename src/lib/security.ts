@@ -25,7 +25,7 @@ export const SECURITY_CONFIG = {
 
 // Authentication utilities
 export function createJWTToken(payload: object, expiresIn: string = '1h'): string {
-  return sign(payload, SECURITY_CONFIG.JWT_SECRET as string, { expiresIn })
+  return sign(payload, SECURITY_CONFIG.JWT_SECRET as string, { expiresIn } as any)
 }
 
 export function verifyJWTToken(token: string): unknown {

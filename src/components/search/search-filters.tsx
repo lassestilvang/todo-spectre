@@ -87,7 +87,7 @@ export function SearchFilters({ onFilterChange, currentFilters }: SearchFiltersP
           <div className="space-y-3">
             <div>
               <Label className="text-sm font-medium">Status</Label>
-              <Select value={localFilters.status || ''} onValueChange={handleStatusChange}>
+              <Select value={typeof localFilters.status === 'string' ? localFilters.status : ''} onValueChange={handleStatusChange}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -120,7 +120,7 @@ export function SearchFilters({ onFilterChange, currentFilters }: SearchFiltersP
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="include-lists"
-                checked={localFilters.include_lists || false}
+                checked={typeof localFilters.include_lists === 'boolean' ? localFilters.include_lists : false}
                 onCheckedChange={handleIncludeListsChange}
               />
               <Label htmlFor="include-lists" className="text-sm font-medium">

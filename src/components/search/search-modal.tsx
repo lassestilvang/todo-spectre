@@ -62,6 +62,21 @@ export function SearchModal() {
     }
   }, [searchQuery, filters, page]);
 
+  const handleResultClick = (result: Task | List) => {
+    if (result.hasOwnProperty('list_id')) {
+      // It's a task
+      const task = result as Task;
+      trackSearchResultClick('task', task.id);
+      router.push(`/tasks/${task.id}`);
+    } else {
+      // It's a list
+      const list = result as List;
+      trackSearchResultClick('list', list.id);
+      router.push(`/lists/${list.id}`);
+    }
+    closeSearch();
+  };
+
   useEffect(() => {
     if (isSearchOpen) {
       // Reset to first page when opening or changing query/filters
@@ -124,21 +139,6 @@ export function SearchModal() {
     }
   }, [selectedResultIndex]);
 
-  const handleResultClick = (result: Task | List) => {
-    if (result.hasOwnProperty('list_id')) {
-      // It's a task
-      const task = result as Task;
-      trackSearchResultClick('task', task.id);
-      router.push(`/tasks/${task.id}`);
-    } else {
-      // It's a list
-      const list = result as List;
-      trackSearchResultClick('list', list.id);
-      router.push(`/lists/${list.id}`);
-    }
-    closeSearch();
-  };
-
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -151,7 +151,7 @@ export function SearchModal() {
             <span>Search</span>
             <div className="flex items-center gap-2">
               <SearchFilters
-                onFilterChange={setFilters}
+                onFilterChange={(newFilters) => setFilters(newFilters as Record<string, string | number | boolean>)}
                 currentFilters={filters}
               />
             </div>

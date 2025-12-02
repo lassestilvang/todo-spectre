@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { EditTaskForm } from '@/components/tasks/edit-task-form';
 import { Task } from '@/types/task-types';

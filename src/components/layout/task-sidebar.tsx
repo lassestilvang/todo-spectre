@@ -23,6 +23,7 @@ export function TaskSidebar() {
 
   // Lists state
   const [lists, setLists] = useState<List[]>([]);
+  const [activeListId, setActiveListId] = useState<number | null>(null);
   const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
 
   // Views state
@@ -32,9 +33,11 @@ export function TaskSidebar() {
     { id: 3, user_id: 1, name: 'Upcoming', type: 'month', show_completed: false, created_at: new Date(), updated_at: new Date() },
     { id: 4, user_id: 1, name: 'All Tasks', type: 'custom', show_completed: false, created_at: new Date(), updated_at: new Date() }
   ]);
+  const [activeViewId, setActiveViewId] = useState<number | null>(null);
 
   // Labels state
   const [labels, setLabels] = useState<Label[]>([]);
+  const [activeLabelId, setActiveLabelId] = useState<number | null>(null);
   const [isCreateLabelDialogOpen, setIsCreateLabelDialogOpen] = useState(false);
 
   // Search context
@@ -107,9 +110,18 @@ export function TaskSidebar() {
     ));
   };
 
+  // Helper functions for determining active item classes
+  const getListItemClass = (listId: number) => {
+    return `px-2 py-1 rounded cursor-pointer ${activeListId === listId ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'}`;
+  };
 
+  const getViewLinkClass = (viewId: number) => {
+    return `px-2 py-1 rounded cursor-pointer ${activeViewId === viewId ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'}`;
+  };
 
-
+  const getLabelItemClass = (labelId: number) => {
+    return `px-2 py-1 rounded cursor-pointer ${activeLabelId === labelId ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'}`;
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

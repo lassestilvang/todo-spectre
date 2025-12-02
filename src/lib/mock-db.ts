@@ -78,32 +78,34 @@ export const mockDb = {
       let tasks = [...mockTasks];
 
       // Apply where conditions
-      if (options.where) {
-        if (options.where.list) {
-          tasks = tasks.filter(task => task.list_id === options.where.list.id);
+      const where = options.where;
+      if (where) {
+        if (where.list?.id) {
+          tasks = tasks.filter(task => task.list_id === where.list!.id);
         }
-        if (options.where.status) {
-          tasks = tasks.filter(task => task.status === options.where.status);
+        if (where.status) {
+          tasks = tasks.filter(task => task.status === where.status);
         }
-        if (options.where.priority) {
-          tasks = tasks.filter(task => task.priority === options.where.priority);
+        if (where.priority) {
+          tasks = tasks.filter(task => task.priority === where.priority);
         }
-        if (options.where.list_id) {
-          tasks = tasks.filter(task => task.list_id === options.where.list_id);
+        if (where.list_id) {
+          tasks = tasks.filter(task => task.list_id === where.list_id);
         }
       }
 
       // Apply include relations
-      if (options.include) {
+      const include = options.include;
+      if (include) {
         tasks = tasks.map(task => {
           const result: any = { ...task };
-          if (options.include.task_logs) {
+          if (include.task_logs) {
             result.task_logs = mockTaskLogs.filter(log => log.task_id === task.id);
           }
-          if (options.include.task_labels) {
+          if (include.task_labels) {
             result.task_labels = mockTaskLabels.filter(label => label.task_id === task.id);
           }
-          if (options.include.task_attachments) {
+          if (include.task_attachments) {
             result.task_attachments = mockTaskAttachments.filter(attachment => attachment.task_id === task.id);
           }
           return result;

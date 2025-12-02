@@ -5,29 +5,32 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3001', 'vercel.com'],
+      allowedOrigins: ["localhost:3000", "vercel.com"],
     },
     viewTransition: true,
+  },
+  turbopack: {
+    root: "/Users/lasse/Sites/todo-spectre",
   },
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
+        protocol: "http",
+        hostname: "localhost",
       },
       {
-        protocol: 'https',
-        hostname: 'vercel.com',
+        protocol: "https",
+        hostname: "vercel.com",
       },
     ],
     unoptimized: true,
   },
-  transpilePackages: ['framer-motion'],
+  transpilePackages: ["framer-motion"],
   compiler: {
     styledComponents: true,
     emotion: true,
   },
-  output: 'standalone',
+  output: "standalone",
   poweredByHeader: false,
   compress: true,
 };

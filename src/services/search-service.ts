@@ -61,15 +61,12 @@ export class SearchService {
       // Get all tasks and lists for the user
       const tasks = await mockDb.task.findMany({
         where: {
-          list: {
-            user_id: userId
-          }
+          list_id: userId
         },
         include: {
           task_logs: true,
           task_labels: true,
-          task_attachments: true,
-          list: true
+          task_attachments: true
         }
       });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ interface TaskListProps {
 }
 
 export function TaskList({ tasks, title, onTaskClick, onRefresh, isLoading, error, onRetry }: TaskListProps) {
+  const router = useRouter();
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<number | null>(null);
 

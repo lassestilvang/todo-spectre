@@ -26,13 +26,6 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
   const [showLogs, setShowLogs] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (taskId && isOpen) {
-      fetchTask();
-      fetchTaskLogs();
-    }
-  }, [taskId, isOpen, fetchTask, fetchTaskLogs]);
-
   const fetchTask = async () => {
     try {
       setIsLoading(true);
@@ -62,6 +55,13 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskD
       console.error('Error fetching task logs:', err);
     }
   };
+
+  useEffect(() => {
+    if (taskId && isOpen) {
+      fetchTask();
+      fetchTaskLogs();
+    }
+  }, [taskId, isOpen, fetchTask, fetchTaskLogs]);
 
   const handleDelete = async () => {
     try {

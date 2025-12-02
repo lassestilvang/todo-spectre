@@ -95,12 +95,12 @@ export function NaturalLanguageTaskForm({ isOpen, onClose, onTaskCreated, listId
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
               <h3 className="font-semibold mb-2">Parsed Task Details:</h3>
               <div className="space-y-2 text-sm">
-                <p><strong>Title:</strong> {parsedData.title}</p>
-                {parsedData.description && <p><strong>Description:</strong> {parsedData.description}</p>}
-                {parsedData.due_date && <p><strong>Due Date:</strong> {new Date(parsedData.due_date).toLocaleString()}</p>}
-                {parsedData.priority && <p><strong>Priority:</strong> {getPriorityLabel(parsedData.priority)}</p>}
-                {parsedData.estimate && <p><strong>Estimated Time:</strong> {Math.floor(parsedData.estimate / 60)} hours {parsedData.estimate % 60} minutes</p>}
-                {parsedData.reminders && parsedData.reminders.length > 0 && (
+                <p><strong>Title:</strong> {typeof parsedData.title === 'string' ? parsedData.title : 'N/A'}</p>
+                {typeof parsedData.description === 'string' && parsedData.description && <p><strong>Description:</strong> {parsedData.description}</p>}
+                {typeof parsedData.due_date === 'string' && parsedData.due_date && <p><strong>Due Date:</strong> {new Date(parsedData.due_date).toLocaleString()}</p>}
+                {typeof parsedData.priority === 'number' && parsedData.priority && <p><strong>Priority:</strong> {getPriorityLabel(parsedData.priority)}</p>}
+                {typeof parsedData.estimate === 'number' && parsedData.estimate && <p><strong>Estimated Time:</strong> {Math.floor(parsedData.estimate / 60)} hours {parsedData.estimate % 60} minutes</p>}
+                {Array.isArray(parsedData.reminders) && parsedData.reminders.length > 0 && (
                   <p><strong>Reminders:</strong> {parsedData.reminders.join(', ')}</p>
                 )}
               </div>

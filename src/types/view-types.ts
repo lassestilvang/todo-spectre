@@ -1,4 +1,5 @@
 import { ViewFilterCriteria, ViewSortOrder } from '@/types/filter-types';
+import { Task } from '@/types/task-types';
 
 export interface View {
   id: number;

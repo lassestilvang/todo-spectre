@@ -18,28 +18,34 @@ function setupPerformanceObservers() {
   // Navigation timing observer
   const navigationObserver = new PerformanceObserver((list) => {
     const entries = list.getEntriesByType('navigation')
-    entries.forEach((entry: PerformanceNavigationTiming) => {
-      console.log('Navigation timing:', {
-        domainLookup: entry.domainLookupEnd - entry.domainLookupStart,
-        connect: entry.connectEnd - entry.connectStart,
-        request: entry.responseEnd - entry.requestStart,
-        processing: entry.domContentLoadedEventEnd - entry.responseEnd,
-        load: entry.loadEventEnd - entry.loadEventStart,
-        total: entry.loadEventEnd - entry.startTime,
-      })
+    entries.forEach((entry) => {
+      if (entry.entryType === 'navigation') {
+        const navEntry = entry as PerformanceNavigationTiming;
+        console.log('Navigation timing:', {
+          domainLookup: navEntry.domainLookupEnd - navEntry.domainLookupStart,
+          connect: navEntry.connectEnd - navEntry.connectStart,
+          request: navEntry.responseEnd - navEntry.requestStart,
+          processing: navEntry.domContentLoadedEventEnd - navEntry.responseEnd,
+          load: navEntry.loadEventEnd - navEntry.loadEventStart,
+          total: navEntry.loadEventEnd - navEntry.startTime,
+        })
+      }
     })
   })
 
   // Resource timing observer
   const resourceObserver = new PerformanceObserver((list) => {
     const entries = list.getEntriesByType('resource')
-    entries.forEach((entry: PerformanceResourceTiming) => {
-      if (entry.duration > 1000) {
-        console.warn('Slow resource:', {
-          name: entry.name,
-          duration: entry.duration,
-          initiatorType: entry.initiatorType,
-        })
+    entries.forEach((entry) => {
+      if (entry.entryType === 'resource') {
+        const resourceEntry = entry as PerformanceResourceTiming;
+        if (resourceEntry.duration > 1000) {
+          console.warn('Slow resource:', {
+            name: resourceEntry.name,
+            duration: resourceEntry.duration,
+            initiatorType: resourceEntry.initiatorType,
+          })
+        }
       }
     })
   })

@@ -2,6 +2,7 @@ import { mockDb } from '@/lib/mock-db';
 import { DatabaseError } from '@/lib/errors';
 import { View, CreateViewInput, UpdateViewInput, ViewService as IViewService } from '@/types/view-types';
 import { TaskService } from './task-service';
+import { Task } from '@/types/task-types';
 
 // For testing, we need to use the mockPrisma from tests
 // This allows tests to properly mock the database

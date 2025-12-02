@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'test') {
   db = mockDb
 }
 import { DatabaseError } from '@/lib/errors';
-import { Task, CreateTaskInput, UpdateTaskInput, TaskService as ITaskService, TaskLog, TaskLabel, TaskAttachment, TaskFilterCriteria } from '@/types/task-types';
+import { Task, CreateTaskInput, UpdateTaskInput, TaskService as ITaskService, TaskLog, TaskLabel, TaskAttachment } from '@/types/task-types';
 import { TaskFilterCriteria as FilterCriteria } from '@/types/filter-types';
 
 export class TaskService implements ITaskService {
