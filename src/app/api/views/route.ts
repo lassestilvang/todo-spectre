@@ -58,8 +58,20 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating view:', error);
     if (error instanceof DatabaseError) {
+      if (error.code === 'VALIDATION_ERROR') {
+        return NextResponse.json(
+          { error: error.message, details: error.code },
+          { status: 500 }
+        );
+      }
       return NextResponse.json(
         { error: 'Database error', details: error.message },
+        { status: 500 }
+      );
+    }
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message, details: 'VALIDATION_ERROR' },
         { status: 500 }
       );
     }
