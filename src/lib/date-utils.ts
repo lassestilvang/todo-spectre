@@ -123,7 +123,7 @@ export function validateTaskDate(dateString: string | null | undefined): {
       valid: true,
       parsedDate,
     }
-  } catch (error) {
+  } catch {
     return {
       valid: false,
       error: 'Invalid date format',
