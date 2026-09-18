@@ -5,7 +5,6 @@ import { List } from '@/types/list-types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, List as ListIcon, Tag, Calendar, AlertCircle } from 'lucide-react';
-import Link from 'next/link';
 
 interface SearchResultsProps {
   results: (Task | List)[];
