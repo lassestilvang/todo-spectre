@@ -14,7 +14,8 @@ const userPreferences: Map<number, UserPreferences> = new Map();
 export async function recordUserAction(
   userId: number,
   actionType: 'task_created' | 'scheduling_accepted' | 'priority_set' | 'time_estimated',
-  actionData: any
+   
+  actionData: Record<string, unknown>
 ): Promise<void> {
   // Initialize preferences if not exists
   if (!userPreferences.has(userId)) {
@@ -61,15 +62,15 @@ export async function getUserPreferences(userId: number): Promise<UserPreference
 /**
  * Update preferences from task creation
  */
-function updateFromTaskCreation(preferences: UserPreferences, taskData: any) {
+function updateFromTaskCreation(preferences: UserPreferences, taskData: Record<string, unknown>) {
   // Learn from task creation patterns
-  if (taskData.time_of_day && ['morning', 'afternoon', 'evening'].includes(taskData.time_of_day)) {
+  if (taskData.time_of_day && typeof taskData.time_of_day === 'string' && ['morning', 'afternoon', 'evening'].includes(taskData.time_of_day)) {
     const timeOfDay = taskData.time_of_day as 'morning' | 'afternoon' | 'evening';
     preferences.time_preferences[timeOfDay] =
       (preferences.time_preferences[timeOfDay] || 0) + 0.1;
   }
 
-  if (taskData.duration) {
+  if (taskData.duration && typeof taskData.duration === 'number') {
     const durationCategory = getDurationCategory(taskData.duration);
     preferences.duration_estimates[durationCategory] =
       (preferences.duration_estimates[durationCategory] || 0) + 0.05;
@@ -79,8 +80,8 @@ function updateFromTaskCreation(preferences: UserPreferences, taskData: any) {
 /**
  * Update preferences from scheduling acceptance
  */
-function updateFromSchedulingAcceptance(preferences: UserPreferences, schedulingData: any) {
-  if (schedulingData.time_slot) {
+function updateFromSchedulingAcceptance(preferences: UserPreferences, schedulingData: Record<string, unknown>) {
+  if (schedulingData.time_slot && typeof schedulingData.time_slot === 'string') {
     const hour = DateTime.fromISO(schedulingData.time_slot).hour;
     const timeCategory = getTimeCategory(hour);
 
@@ -96,8 +97,8 @@ function updateFromSchedulingAcceptance(preferences: UserPreferences, scheduling
 /**
  * Update preferences from priority setting
  */
-function updateFromPrioritySetting(preferences: UserPreferences, priorityData: any) {
-  if (priorityData.priority_level !== undefined) {
+function updateFromPrioritySetting(preferences: UserPreferences, priorityData: Record<string, unknown>) {
+  if (priorityData.priority_level !== undefined && typeof priorityData.priority_level === 'number') {
     const priorityIndex = Math.min(3, Math.max(0, priorityData.priority_level));
     preferences.priority_distribution[priorityIndex] =
       (preferences.priority_distribution[priorityIndex] || 0) + 0.1;
@@ -115,8 +116,8 @@ function updateFromPrioritySetting(preferences: UserPreferences, priorityData: a
 /**
  * Update preferences from time estimation
  */
-function updateFromTimeEstimation(preferences: UserPreferences, timeData: any) {
-  if (timeData.estimated_minutes) {
+function updateFromTimeEstimation(preferences: UserPreferences, timeData: Record<string, unknown>) {
+  if (timeData.estimated_minutes && typeof timeData.estimated_minutes === 'number') {
     const durationCategory = getDurationCategory(timeData.estimated_minutes);
     preferences.duration_estimates[durationCategory] =
       (preferences.duration_estimates[durationCategory] || 0) + 0.1;
@@ -215,4 +216,8 @@ export interface UserPreferences {
   priority_distribution: number[]; // [none, low, medium, high] probabilities
   last_updated: Date;
   learning_samples: number;
+}
+export class UserPreferenceLearning {
+  static recordUserAction = recordUserAction;
+  static getUserPreferences = getUserPreferences;
 }
