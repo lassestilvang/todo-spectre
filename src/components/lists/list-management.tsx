@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import { ListItem } from './list-item';
 import { CreateListForm } from './create-list-form';
 import { EditListForm } from './edit-list-form';
@@ -17,10 +17,6 @@ export function ListManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingList, setEditingList] = useState<List | null>(null);
-
-  useEffect(() => {
-    fetchLists();
-  }, []);
 
   const fetchLists = async () => {
     setLoading(true);
@@ -47,6 +43,11 @@ export function ListManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const createDefaultList = async () => {
     try {
