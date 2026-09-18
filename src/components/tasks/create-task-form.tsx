@@ -307,7 +307,7 @@ export function CreateTaskForm({ isOpen, onClose, onTaskCreated, listId }: Creat
 
           <div className="space-y-2">
             <Label htmlFor="recurring">Recurring</Label>
-            <Select value={recurring} onValueChange={setRecurring}>
+            <Select value={recurring || ''} onValueChange={(v) => setRecurring(v || null)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select recurring pattern" />
               </SelectTrigger>
