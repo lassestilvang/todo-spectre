@@ -93,7 +93,7 @@ export async function PUT(request: Request) {
     console.error('Error updating list:', error);
     if (error instanceof DatabaseError) {
       return NextResponse.json(
-        { error: 'Database error', details: error.message },
+        { error: error.message, details: error.code },
         { status: 500 }
       );
     }
