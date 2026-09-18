@@ -13,6 +13,7 @@ const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
     {...props}
   />
 );
+Pagination.displayName = 'Pagination';
 
 const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
   ({ className, ...props }, ref) => {
@@ -21,6 +22,7 @@ const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProp
     );
   }
 );
+PaginationContent.displayName = 'PaginationContent';
 
 const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(
   ({ className, ...props }, ref) => {
@@ -29,6 +31,7 @@ const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'
     );
   }
 );
+PaginationItem.displayName = 'PaginationItem';
 
 const PaginationPrevious = ({
   className,
@@ -50,6 +53,7 @@ const PaginationPrevious = ({
     <span>Previous</span>
   </Button>
 );
+PaginationPrevious.displayName = 'PaginationPrevious';
 
 const PaginationNext = ({
   className,
@@ -71,6 +75,7 @@ const PaginationNext = ({
     <ChevronRight className="h-4 w-4" />
   </Button>
 );
+PaginationNext.displayName = 'PaginationNext';
 
 const PaginationLink = ({
   className,
@@ -91,6 +96,7 @@ const PaginationLink = ({
     {children}
   </Button>
 );
+PaginationLink.displayName = 'PaginationLink';
 
 export {
   Pagination,
