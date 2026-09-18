@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { Task } from '@/types/task-types';
+
 
 /**
  * Smart Scheduling Algorithm
@@ -115,7 +115,7 @@ export class SchedulingAlgorithm {
   /**
    * Analyze user's availability based on existing tasks
    */
-  public static async analyzeAvailability(userId: number): Promise<AvailabilityAnalysis> {
+  public static async analyzeAvailability(_userId: number): Promise<AvailabilityAnalysis> {
     // In a real implementation, this would:
     // 1. Fetch all user's tasks and events
     // 2. Analyze time distribution
