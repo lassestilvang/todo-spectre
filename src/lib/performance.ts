@@ -74,7 +74,8 @@ export function usePerformanceOptimization() {
 }
 
 // Memoization utilities
-export function useOptimizedMemo<T>(factory: () => T, deps: unknown[]): T {
+export function useOptimizedMemo<T>(factory: () => T, deps: React.DependencyList): T {
+   
   return useMemo(() => {
     const start = performance.now()
     const result = factory()
@@ -85,14 +86,16 @@ export function useOptimizedMemo<T>(factory: () => T, deps: unknown[]): T {
     }
 
     return result
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 }
 
 // Callback optimization
 export function useOptimizedCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
-  deps: unknown[]
+  deps: React.DependencyList
 ): T {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(callback, deps)
 }
 
@@ -244,9 +247,10 @@ function getPaintMetrics() {
 }
 
 function getMemoryMetrics() {
-  if (typeof (performance as any).memory === 'undefined') return null
+  const perfWithMemory = performance as Performance & { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }
+  if (typeof perfWithMemory.memory === 'undefined') return null
 
-  const memory = (performance as any).memory as {
+  const memory = perfWithMemory.memory as {
     usedJSHeapSize: number;
     totalJSHeapSize: number;
     jsHeapSizeLimit: number;
