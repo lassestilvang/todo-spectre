@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const tasks = await mockDb.task.findMany({});
+    const tasks = await prisma.task.findMany({});
     return NextResponse.json({
       tasks: tasks,
       count: tasks.length
