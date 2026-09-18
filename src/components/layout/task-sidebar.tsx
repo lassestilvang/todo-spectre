@@ -7,7 +7,8 @@ import { View } from '@/types/view-types';
 import { Label } from '@/types/label-types';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
-import { Plus, Menu, X, Tag, List as ListIcon, Calendar, CheckSquare, Eye, EyeOff, Search } from 'lucide-react';
+import { Plus, Menu, X, Tag, List as ListIcon, Calendar, CheckSquare, Eye, EyeOff, Search, LayoutGrid, Flame, Timer } from 'lucide-react';
+import Link from 'next/link';
 import { CreateListForm } from '@/components/lists/create-list-form';
 import { CreateLabelForm } from '@/components/labels/create-label-form';
 import { SearchModal } from '@/components/search/search-modal';
@@ -250,6 +251,21 @@ export function TaskSidebar() {
                 </Toggle>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 space-y-1">
+            <Link href="/kanban" className="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground">
+              <LayoutGrid className="w-4 h-4" />
+              <span className="text-sm">Kanban Board</span>
+            </Link>
+            <Link href="/habits" className="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground">
+              <Flame className="w-4 h-4" />
+              <span className="text-sm">Habits</span>
+            </Link>
+            <Link href="/pomodoro" className="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent hover:text-accent-foreground">
+              <Timer className="w-4 h-4" />
+              <span className="text-sm">Pomodoro</span>
+            </Link>
           </div>
         </div>
 
