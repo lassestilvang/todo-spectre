@@ -11,7 +11,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 
 export default function ListPage() {
   const params = useParams();
-  const [list, setList] = useState<any>(null);
+  const [list, setList] = useState<unknown>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,7 +79,7 @@ export default function ListPage() {
   if (error) {
     return (
       <div className="container mx-auto py-8">
-        <ErrorDisplay message={error} onRetry={fetchListAndTasks} />
+        <ErrorDisplay error={error} onRetry={fetchListAndTasks} />
       </div>
     );
   }
@@ -88,7 +88,7 @@ export default function ListPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
-          {list?.icon} {list?.title}
+          {(list as unknown)?.icon} {(list as unknown)?.title}
         </h1>
         <button
           onClick={() => setShowCreateForm(true)}
@@ -100,17 +100,15 @@ export default function ListPage() {
 
       <TaskList
         tasks={tasks}
-        onTaskSelect={setSelectedTask}
-        onTaskUpdated={handleTaskUpdated}
-        onTaskDeleted={handleTaskDeleted}
-        showCompleted={true}
+        title={`Tasks in ${(list as unknown)?.title || 'List'} (${tasks.length})`}
+        onTaskClick={setSelectedTask}
+        onRefresh={fetchListAndTasks}
       />
 
       <CreateTaskForm
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         onTaskCreated={handleTaskCreated}
-        defaultListId={list?.id}
       />
 
       {selectedTask && (
