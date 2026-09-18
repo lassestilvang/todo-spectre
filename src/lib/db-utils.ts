@@ -1,5 +1,5 @@
-import { prisma } from '../../prisma/prisma.config'
-import { Prisma } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+type PrismaErr = { code?: string; meta?: Record<string, unknown>; message?: string }
 
 // Database error types
 export enum DatabaseErrorType {
@@ -34,26 +34,27 @@ export async function executeWithDatabaseErrorHandling<T>(
     return await operation()
   } catch (error) {
     // Convert Prisma errors to our standard format
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
+    const _errName = (error as { constructor?: { name?: string } })?.constructor?.name;
+    if (_errName === 'PrismaClientKnownRequestError') {
+      switch ((error as PrismaErr).code) {
         case 'P2002':
           throw new DatabaseError(
             DatabaseErrorType.CONSTRAINT_ERROR,
-            `Unique constraint violation: ${error.meta?.target}`,
+            `Unique constraint violation: ${(error as PrismaErr).meta?.target}`,
             error,
             context
           )
         case 'P2025':
           throw new DatabaseError(
             DatabaseErrorType.NOT_FOUND_ERROR,
-            `Record not found: ${error.meta?.cause}`,
+            `Record not found: ${(error as PrismaErr).meta?.cause}`,
             error,
             context
           )
         case 'P2003':
           throw new DatabaseError(
             DatabaseErrorType.CONSTRAINT_ERROR,
-            `Foreign key constraint failed: ${error.meta?.field_name}`,
+            `Foreign key constraint failed: ${(error as PrismaErr).meta?.field_name}`,
             error,
             context
           )
@@ -61,29 +62,29 @@ export async function executeWithDatabaseErrorHandling<T>(
         case 'P2022':
           throw new DatabaseError(
             DatabaseErrorType.CONSTRAINT_ERROR,
-            `Table or column not found: ${error.meta?.model_name || error.meta?.field_name}`,
+            `Table or column not found: ${(error as PrismaErr).meta?.model_name || (error as PrismaErr).meta?.field_name}`,
             error,
             context
           )
         default:
           throw new DatabaseError(
             DatabaseErrorType.QUERY_ERROR,
-            `Database query error (${error.code}): ${error.message}`,
+            `Database query error (${(error as PrismaErr).code}): ${(error as PrismaErr).message}`,
             error,
             context
           )
       }
-    } else if (error instanceof Prisma.PrismaClientValidationError) {
+    } else if (_errName === 'PrismaClientValidationError') {
       throw new DatabaseError(
         DatabaseErrorType.VALIDATION_ERROR,
-        `Validation error: ${error.message}`,
+        `Validation error: ${(error as PrismaErr).message}`,
         error,
         context
       )
-    } else if (error instanceof Prisma.PrismaClientInitializationError) {
+    } else if (_errName === 'PrismaClientInitializationError') {
       throw new DatabaseError(
         DatabaseErrorType.CONNECTION_ERROR,
-        `Database connection failed: ${error.message}`,
+        `Database connection failed: ${(error as PrismaErr).message}`,
         error,
         context
       )
@@ -117,7 +118,7 @@ export async function checkDatabaseConnection(): Promise<boolean> {
  * Transaction helper for multiple operations
  */
 export async function executeInTransaction<T>(
-  operations: ((tx: Prisma.TransactionClient) => Promise<T>)[],
+  operations: ((tx: unknown) => Promise<T>)[],
   context: Record<string, unknown> = {}
 ): Promise<T[]> {
   return await prisma.$transaction(async (tx) => {
