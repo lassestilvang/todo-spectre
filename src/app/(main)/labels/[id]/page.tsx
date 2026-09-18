@@ -11,7 +11,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 
 export default function LabelPage() {
   const params = useParams();
-  const [label, setLabel] = useState<any>(null);
+  const [label, setLabel] = useState<unknown>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,7 +79,7 @@ export default function LabelPage() {
   if (error) {
     return (
       <div className="container mx-auto py-8">
-        <ErrorDisplay message={error} onRetry={fetchLabelAndTasks} />
+        <ErrorDisplay error={error} onRetry={fetchLabelAndTasks} />
       </div>
     );
   }
@@ -88,7 +88,7 @@ export default function LabelPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
-          {label?.icon} {label?.name}
+          {(label as unknown)?.icon} {(label as unknown)?.name}
         </h1>
         <button
           onClick={() => setShowCreateForm(true)}
@@ -100,10 +100,9 @@ export default function LabelPage() {
 
       <TaskList
         tasks={tasks}
-        onTaskSelect={setSelectedTask}
-        onTaskUpdated={handleTaskUpdated}
-        onTaskDeleted={handleTaskDeleted}
-        showCompleted={true}
+        title={`Tasks with this label (${tasks.length})`}
+        onTaskClick={setSelectedTask}
+        onRefresh={fetchLabelAndTasks}
       />
 
       <CreateTaskForm
