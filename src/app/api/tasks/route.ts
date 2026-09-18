@@ -81,7 +81,14 @@ export async function POST(request: Request) {
     console.error('Error creating task:', error);
     if (error instanceof DatabaseError) {
       return NextResponse.json(
-        { error: 'Database error', details: error.message },
+        { error: error.message, details: error.code },
+        { status: 500 }
+      );
+    }
+    // Also catch plain Error objects thrown by validation
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message, details: 'VALIDATION_ERROR' },
         { status: 500 }
       );
     }
