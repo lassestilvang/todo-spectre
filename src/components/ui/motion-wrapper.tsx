@@ -9,12 +9,12 @@ interface MotionWrapperProps extends MotionProps {
   delay?: number;
 }
 
-export function MotionWrapper({
+const MotionWrapper = ({
   children,
   className,
   delay = 0,
   ...props
-}: MotionWrapperProps) {
+}: MotionWrapperProps) => {
   const variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -39,7 +39,7 @@ export function MotionWrapper({
       {children}
     </motion.div>
   );
-}
+};
 
 interface StaggeredMotionProps {
   children: ReactNode[];
@@ -47,11 +47,11 @@ interface StaggeredMotionProps {
   itemDelay?: number;
 }
 
-export function StaggeredMotion({
+const StaggeredMotion = ({
   children,
   className,
   itemDelay = 0.1,
-}: StaggeredMotionProps) {
+}: StaggeredMotionProps) => {
   return (
     <div className={className}>
       {children.map((child, index) => (
@@ -61,7 +61,9 @@ export function StaggeredMotion({
       ))}
     </div>
   );
-}
+};
+
+StaggeredMotion.displayName = 'StaggeredMotion';
 
 interface FadeInProps {
   children: ReactNode;
@@ -88,7 +90,7 @@ interface ScaleInProps {
   delay?: number;
 }
 
-export function ScaleIn({ children, className, delay = 0 }: ScaleInProps) {
+const ScaleIn = ({ children, className, delay = 0 }: ScaleInProps) => {
   return (
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
@@ -99,4 +101,8 @@ export function ScaleIn({ children, className, delay = 0 }: ScaleInProps) {
       {children}
     </motion.div>
   );
-}
+};
+
+ScaleIn.displayName = 'ScaleIn';
+
+export { MotionWrapper, StaggeredMotion, ScaleIn, AnimatePresence };
