@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -39,6 +40,7 @@ export function EditTaskForm({ taskId, isOpen, onClose, onTaskUpdated }: EditTas
     if (taskId && isOpen) {
       fetchTask();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskId, isOpen]);
 
   const fetchTask = async () => {
