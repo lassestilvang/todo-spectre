@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TaskList } from './task-list';
 import { CreateTaskForm } from './create-task-form';
@@ -16,7 +16,6 @@ export function TaskManagement() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState('today');
-  const router = useRouter();
 
   useEffect(() => {
     fetchTasks();
