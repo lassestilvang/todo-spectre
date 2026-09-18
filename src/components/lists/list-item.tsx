@@ -10,12 +10,13 @@ import { MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
 interface ListItemProps {
   list: List;
   isActive?: boolean;
-  onSelect: (listId: number) => void;
-  onDelete: (listId: number) => void;
-  onEdit: (list: List) => void;
+  onSelect?: (listId: number) => void;
+  onClick?: (listId: number) => void;
+  onDelete?: (listId: number) => void;
+  onEdit?: (list: List) => void;
 }
 
-export function ListItem({ list, isActive, onSelect, onDelete, onEdit }: ListItemProps) {
+export function ListItem({ list, isActive, onSelect, onClick, onDelete, onEdit }: ListItemProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
@@ -40,7 +41,7 @@ export function ListItem({ list, isActive, onSelect, onDelete, onEdit }: ListIte
         throw new Error(errorData.error || 'Failed to delete list');
       }
 
-      onDelete(list.id);
+      onDelete?.(list.id);
       router.refresh();
     } catch (err) {
       console.error('Error deleting list:', err);
@@ -51,25 +52,25 @@ export function ListItem({ list, isActive, onSelect, onDelete, onEdit }: ListIte
   };
 
   const handleEdit = () => {
-    onEdit(list);
+    if (onEdit) {
+      onEdit(list);
+    }
   };
 
   return (
     <div
-      className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
-        isActive
-          ? 'bg-blue-100 dark:bg-blue-900/50'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+      className={`list-item flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
+        isActive ? 'active bg-blue-100 dark:bg-blue-900/50' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
       }`}
-      onClick={() => onSelect(list.id)}
+      onClick={() => { if (onClick) { onClick(list.id); } else if (onSelect) { onSelect(list.id); } }}
     >
       <div className="flex items-center gap-2 flex-1">
         <div
-          className="w-3 h-3 rounded-full"
+          className="color-indicator w-3 h-3 rounded-full"
           style={{ backgroundColor: list.color || '#6366f1' }}
         />
         <span className="text-sm font-medium truncate">
-          {list.icon} {list.title}
+          <span className="list-icon">{list.icon}</span> {list.title}
         </span>
       </div>
 
@@ -79,19 +80,19 @@ export function ListItem({ list, isActive, onSelect, onDelete, onEdit }: ListIte
             variant="ghost"
             size="icon"
             className="w-6 h-6"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); }}
           >
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleEdit}>
+          <DropdownMenuItem onClick={() => { handleEdit(); }}>
             <Edit2 className="w-4 h-4 mr-2" />
             Edit
           </DropdownMenuItem>
           {list.title !== 'Inbox' && (
             <DropdownMenuItem
-              onClick={handleDelete}
+              onClick={() => { handleDelete(); }}
               disabled={isDeleting}
               className="text-red-600 focus:text-red-600"
             >
