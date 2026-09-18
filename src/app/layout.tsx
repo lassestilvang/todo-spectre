@@ -4,6 +4,7 @@ import "./globals.css";
 import "../styles/css-variables.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Todo Spectre - Daily Task Planner",
-  description: "A professional daily task planner application",
+  title: "Todo Spectre - Smart Task Management",
+  description: "Advanced task planner with natural language processing, smart scheduling, and powerful organization features",
+  manifest: "/manifest.json",
+  themeColor: "#6366f1",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
 };
 
 export default function RootLayout({
@@ -33,6 +37,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system">
           <Providers>
             {children}
+            <Toaster position="bottom-right" richColors />
           </Providers>
         </ThemeProvider>
       </body>
