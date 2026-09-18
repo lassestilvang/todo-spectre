@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SearchInput } from './search-input';
 import { SearchResults } from './search-results';
@@ -8,11 +9,12 @@ import { SearchFilters } from './search-filters';
 import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from '@/components/ui/pagination';
 import { Task } from '@/types/task-types';
 import { List } from '@/types/list-types';
-import { useRouter } from 'next/navigation';
+
 import { useSearch } from '@/context/search-context';
 import { trackSearch, trackSearchResultClick } from '@/lib/search-analytics';
 
 export function SearchModal() {
+  const router = useRouter();
   const { isSearchOpen, closeSearch } = useSearch();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<(Task | List)[]>([]);
@@ -23,7 +25,6 @@ export function SearchModal() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
-  const router = useRouter();
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const performSearch = useCallback(async () => {
