@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Task, TaskLog, TaskLabel, TaskAttachment } from '@/types/task-types';
+import { Task, TaskLog } from '@/types/task-types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Pencil, Trash2, Clock, Calendar, Tag, Paperclip, History, CheckCircle, AlertCircle, MinusCircle, Archive } from 'lucide-react';
 
@@ -14,11 +14,11 @@ interface TaskDetailViewProps {
   taskId: number;
   isOpen: boolean;
   onClose: () => void;
-  onTaskUpdated: (task: Task) => void;
+  onTaskUpdated?: (task: Task) => void;
   onTaskDeleted: (taskId: number) => void;
 }
 
-export function TaskDetailView({ taskId, isOpen, onClose, onTaskUpdated, onTaskDeleted }: TaskDetailViewProps) {
+export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskDetailViewProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [logs, setLogs] = useState<TaskLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
