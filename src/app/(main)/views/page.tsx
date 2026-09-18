@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ViewContainer } from '@/components/views/view-container';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Task } from '@/types/task-types';
@@ -15,7 +15,7 @@ function ViewsPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showCompleted, setShowCompleted] = useState(false);
-  const router = useRouter();
+
   const searchParams = useSearchParams();
 
   // Get active tab from URL or default to 'today'
@@ -89,7 +89,7 @@ function ViewsPageContent() {
     // Update URL with the new tab parameter
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
-    router.push(`/views?${params.toString()}`);
+    // router.push(`/views?${params.toString()}`);
   };
 
   if (isLoading && tasks.length === 0) {
