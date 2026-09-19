@@ -1,4 +1,4 @@
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 import { DatabaseError } from '@/lib/errors';
 import { View, CreateViewInput, UpdateViewInput, ViewService as IViewService } from '@/types/view-types';
 import { TaskService } from './task-service';
@@ -6,20 +6,22 @@ import { Task } from '@/types/task-types';
 
 // For testing, we need to use the mockPrisma from tests
 // This allows tests to properly mock the database
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let db: any
 
 // Check if we're in a test environment and use mockPrisma if available
 if (process.env.NODE_ENV === 'test') {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { mockPrisma } = require('../../tests/mocks/mock-db')
     db = mockPrisma
     console.log('Using mockPrisma for testing')
-  } catch (error) {
-    console.warn('mockPrisma not available, using mockDb')
-    db = mockDb
+  } catch {
+    console.warn('mockPrisma not available, using prisma')
+    db = prisma
   }
 } else {
-  db = mockDb
+  db = prisma
 }
 
 export class ViewService implements IViewService {
@@ -79,7 +81,7 @@ export class ViewService implements IViewService {
       return newView;
     } catch (error) {
       console.error('Error creating view:', error);
-      if (error instanceof Error && error.message.startsWith('View')) {
+      if (error instanceof Error && (error.message.startsWith('View') || error.message.includes('Invalid view type'))) {
         throw new DatabaseError(error.message, 'VALIDATION_ERROR');
       }
       throw new DatabaseError('Failed to create view', 'CREATE_VIEW_ERROR', error);
@@ -131,7 +133,7 @@ export class ViewService implements IViewService {
       return updatedView;
     } catch (error) {
       console.error('Error updating view:', error);
-      if (error instanceof Error && error.message.startsWith('View')) {
+      if (error instanceof Error && (error.message.startsWith('View') || error.message.includes('Invalid view type'))) {
         throw new DatabaseError(error.message, 'VALIDATION_ERROR');
       }
       if (error instanceof DatabaseError) {
