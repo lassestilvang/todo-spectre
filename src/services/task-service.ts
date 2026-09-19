@@ -1,26 +1,22 @@
-// Import mockDb for development
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 
 // For testing, we need to use the mockPrisma from tests
-// This allows tests to properly mock the database
-let db: any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let db: any = prisma;
 
-// Check if we're in a test environment and use mockPrisma if available
 if (process.env.NODE_ENV === 'test') {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { mockPrisma } = require('../../tests/mocks/mock-db')
     db = mockPrisma
-    console.log('Using mockPrisma for testing')
-  } catch (error) {
-    console.warn('mockPrisma not available, using mockDb')
-    db = mockDb
+  } catch {
+    db = prisma
   }
 } else {
-  db = mockDb
+  db = prisma
 }
 import { DatabaseError } from '@/lib/errors';
-import { Task, CreateTaskInput, UpdateTaskInput, TaskService as ITaskService, TaskLog, TaskLabel, TaskAttachment } from '@/types/task-types';
+import { Task, CreateTaskInput, UpdateTaskInput, TaskService as ITaskService, TaskLog } from '@/types/task-types';
 import { TaskFilterCriteria as FilterCriteria } from '@/types/filter-types';
 
 export class TaskService implements ITaskService {
@@ -73,7 +69,7 @@ export class TaskService implements ITaskService {
     }
   }
 
-  async getTaskById(id: number, userId: number): Promise<Task | null> {
+  async getTaskById(id: number, _userId: number): Promise<Task | null> {
     try {
       // For mock database, just find by ID since we don't have proper user associations
       const task = await db.task.findUnique({
@@ -294,7 +290,7 @@ export class TaskService implements ITaskService {
     }
   }
 
-  async addTaskLog(taskId: number, userId: number, action: string, changes?: Record<string, unknown>): Promise<TaskLog> {
+  async addTaskLog(taskId: number, _userId: number, action: string, changes?: Record<string, unknown>): Promise<TaskLog> {
     try {
       const taskLog = await db.taskLog.create({
         data: {
@@ -311,7 +307,7 @@ export class TaskService implements ITaskService {
     }
   }
 
-  async getTaskLogs(taskId: number, userId: number): Promise<TaskLog[]> {
+  async getTaskLogs(taskId: number, _userId: number): Promise<TaskLog[]> {
     try {
       // Verify the task belongs to the user
       const task = await db.task.findUnique({
@@ -524,11 +520,11 @@ export class TaskService implements ITaskService {
       });
 
       // Filter tasks that have the specified label
-      const filteredTasks = tasks.filter(task => {
-        return task.task_labels.some(label => label.id === labelId);
+      const filteredTasks = (tasks as unknown[]).filter((task: unknown) => {
+        return task.task_labels?.some((label: { id: number }) => label.id === labelId);
       });
 
-      return filteredTasks;
+      return filteredTasks as Task[];
     } catch (error) {
       console.error('Error getting tasks by label:', error);
       throw new DatabaseError('Failed to get tasks by label', 'GET_TASKS_BY_LABEL_ERROR', error);
