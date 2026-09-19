@@ -126,20 +126,24 @@ export function isViewTransitionSupported(): boolean {
 
 // Fallback for unsupported browsers
 export function withViewTransitionFallback(
-  Component: React.ComponentType,
+  Component: React.ComponentType<unknown>,
   fallbackConfig: ViewTransitionConfig = { type: 'none' }
 ) {
-  return function WrappedComponent(props: any) {
+  const WrappedComponent = (props: Record<string, unknown>) => {
     const { isSupported } = useViewTransition()
 
     if (!isSupported) {
       return React.createElement(Component, props)
     }
 
-    return (
-      React.createElement(ViewTransitionWrapper, { config: fallbackConfig, children: React.createElement(Component, props) })
-    )
+    return React.createElement(
+      ViewTransitionWrapper,
+      { config: fallbackConfig } as unknown,
+      React.createElement(Component, props)
+    ) as unknown
   }
+  WrappedComponent.displayName = `WithViewTransitionFallback(${Component.displayName || Component.name || 'Component'})`
+  return WrappedComponent
 }
 
 // View transition context
