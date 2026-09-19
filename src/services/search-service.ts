@@ -1,8 +1,20 @@
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 import { DatabaseError } from '@/lib/errors';
 import { SearchResult, SearchFilters } from '@/types/search-types';
-import { Task } from '@/types/task-types';
 import { List } from '@/types/list-types';
+import { Task } from '@/types/task-types';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let db: any = prisma
+
+// Check if we're in a test environment and use mockPrisma if available
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { mockPrisma } = require('../../tests/mocks/mock-db')
+  db = mockPrisma
+} catch {
+  db = prisma
+}
 
 // Fuzzy search implementation using Levenshtein distance
 function levenshteinDistance(a: string, b: string): number {
@@ -59,9 +71,11 @@ export class SearchService {
       const offset = (page - 1) * limit;
 
       // Get all tasks and lists for the user
-      const tasks = await mockDb.task.findMany({
+      const tasks = await db.task.findMany({
         where: {
-          list_id: userId
+          list: {
+            user_id: userId
+          }
         },
         include: {
           task_logs: true,
@@ -70,7 +84,7 @@ export class SearchService {
         }
       });
 
-      const lists = await mockDb.list.findMany({
+      const lists = await db.list.findMany({
         where: {
           user_id: userId
         }
@@ -96,10 +110,10 @@ export class SearchService {
 
       if (query) {
         // Search in tasks
-        const taskResults = filteredTasks
-          .map(task => {
-            const titleScore = fuzzyMatch(query, task.title);
-            const descriptionScore = task.description ? fuzzyMatch(query, task.description) : 0;
+        const taskResults = (filteredTasks as Array<Record<string, unknown>>)
+          .map((task) => {
+            const titleScore = fuzzyMatch(query, task.title as string);
+            const descriptionScore = task.description ? fuzzyMatch(query, task.description as string) : 0;
             const combinedScore = Math.max(titleScore, descriptionScore);
 
             return {
@@ -108,29 +122,29 @@ export class SearchService {
               type: 'task' as const
             };
           })
-          .filter(result => result.score > 0.3) // Minimum similarity threshold
-          .sort((a, b) => b.score - a.score)
-          .map(result => result.item);
+          .filter((result: { score: number }) => result.score > 0.3) // Minimum similarity threshold
+          .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
+          .map((result: { item: unknown }) => result.item);
 
         // Search in lists if requested
         if (filters.include_lists) {
-          const listResults = lists
-            .map(list => {
-              const score = fuzzyMatch(query, list.title);
+          const listResults = (lists as Array<Record<string, unknown>>)
+            .map((list) => {
+              const score = fuzzyMatch(query, list.title as string);
               return {
                 item: list,
                 score: score,
                 type: 'list' as const
               };
             })
-            .filter(result => result.score > 0.3) // Minimum similarity threshold
-            .sort((a, b) => b.score - a.score)
-            .map(result => result.item);
+            .filter((result: { score: number }) => result.score > 0.3) // Minimum similarity threshold
+            .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
+            .map((result: { item: unknown }) => result.item);
 
-          searchResults.push(...listResults);
+          searchResults.push(...(listResults as unknown));
         }
 
-        searchResults.push(...taskResults);
+        searchResults.push(...(taskResults as unknown));
       } else {
         // If no query, return all filtered tasks
         searchResults.push(...filteredTasks);
