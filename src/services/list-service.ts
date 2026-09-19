@@ -1,5 +1,20 @@
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 import { DatabaseError } from '@/lib/errors';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let db: any = prisma
+
+if (process.env.NODE_ENV === 'test') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { mockPrisma } = require('../../tests/mocks/mock-db')
+    db = mockPrisma
+  } catch {
+    db = prisma
+  }
+} else {
+  db = prisma
+}
 import { List, CreateListInput, UpdateListInput, ListService as IListService } from '@/types/list-types';
 
 export class ListService implements IListService {
@@ -9,7 +24,7 @@ export class ListService implements IListService {
 
   async getAllLists(userId: number): Promise<List[]> {
     try {
-      const lists = await mockDb.list.findMany({
+      const lists = await db.list.findMany({
         where: {
           user_id: userId
         }
@@ -24,7 +39,7 @@ export class ListService implements IListService {
 
   async getListById(id: number, userId: number): Promise<List | null> {
     try {
-      const list = await mockDb.list.findUnique({
+      const list = await db.list.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -45,7 +60,7 @@ export class ListService implements IListService {
         throw new Error('List title is required');
       }
 
-      const newList = await mockDb.list.create({
+      const newList = await db.list.create({
         data: {
           user_id: userId,
           title: data.title.trim(),
@@ -67,13 +82,14 @@ export class ListService implements IListService {
   async updateList(id: number, userId: number, data: UpdateListInput): Promise<List> {
     try {
       // Get the current list to check if it's the default list
-      const currentList = await mockDb.list.findUnique({
+      const currentList = await db.list.findUnique({
         where: {
           id: id,
           user_id: userId
         }
       });
 
+      console.log('currentList', currentList && currentList.id, currentList && currentList.title)
       if (!currentList) {
         throw new DatabaseError('List not found', 'LIST_NOT_FOUND');
       }
@@ -90,7 +106,7 @@ export class ListService implements IListService {
         throw new Error('List title cannot be empty');
       }
 
-      const updatedList = await mockDb.list.update({
+      const updatedList = await db.list.update({
         where: {
           id: id,
           user_id: userId
@@ -119,7 +135,7 @@ export class ListService implements IListService {
   async deleteList(id: number, userId: number): Promise<void> {
     try {
       // Get the list to check if it's the default list
-      const list = await mockDb.list.findUnique({
+      const list = await db.list.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -135,7 +151,7 @@ export class ListService implements IListService {
         throw new DatabaseError('Cannot delete the Inbox list', 'INBOX_DELETE_ERROR');
       }
 
-      await mockDb.list.delete({
+      await db.list.delete({
         where: {
           id: id,
           user_id: userId
@@ -153,7 +169,7 @@ export class ListService implements IListService {
   async getDefaultList(userId: number): Promise<List> {
     try {
       // Try to find an existing Inbox list
-      let defaultList = await mockDb.list.findFirst({
+      let defaultList = await db.list.findFirst({
         where: {
           user_id: userId,
           title: this.DEFAULT_LIST_TITLE
@@ -175,7 +191,7 @@ export class ListService implements IListService {
   async ensureDefaultList(userId: number): Promise<List> {
     try {
       // Check if default list exists
-      const existingDefault = await mockDb.list.findFirst({
+      const existingDefault = await db.list.findFirst({
         where: {
           user_id: userId,
           title: this.DEFAULT_LIST_TITLE
@@ -195,7 +211,7 @@ export class ListService implements IListService {
   }
 
   private async createDefaultList(userId: number): Promise<List> {
-    const newList = await mockDb.list.create({
+    const newList = await db.list.create({
       data: {
         user_id: userId,
         title: this.DEFAULT_LIST_TITLE,
