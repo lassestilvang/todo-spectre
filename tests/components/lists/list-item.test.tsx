@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { renderWithProviders } from '../../utils'
-import ListItem from '../../../src/components/lists/list-item'
-import { testData } from '../../utils'
+import { describe, it, expect, vi } from 'vitest'
+import { renderWithProviders } from '../../utils.tsx'
+import { ListItem } from '../../../src/components/lists/list-item'
+import { testData } from '../../utils.tsx'
 
 describe('ListItem Component', () => {
   const mockList = {
@@ -16,7 +16,7 @@ describe('ListItem Component', () => {
 
   it('should render list item with title and icon', () => {
     const { getByText, container } = renderWithProviders(
-      <ListItem list={mockList} />
+      <ListItem list={mockList} onSelect={() => {}} onDelete={() => {}} onEdit={() => {}} />
     )
 
     expect(getByText('Test List')).toBeInTheDocument()
