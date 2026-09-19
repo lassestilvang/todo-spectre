@@ -1,11 +1,24 @@
-import { mockDb } from '@/lib/mock-db';
+import { prisma } from '@/lib/prisma';
 import { DatabaseError } from '@/lib/errors';
 import { Label, CreateLabelInput, UpdateLabelInput, LabelService as ILabelService } from '@/types/label-types';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let db: any = prisma;
+
+if (process.env.NODE_ENV === 'test') {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { mockPrisma } = require('../../tests/mocks/mock-db')
+    db = mockPrisma
+  } catch {
+    db = prisma
+  }
+}
 
 export class LabelService implements ILabelService {
   async getAllLabels(userId: number): Promise<Label[]> {
     try {
-      const labels = await mockDb.label.findMany({
+      const labels = await db.label.findMany({
         where: {
           user_id: userId
         }
@@ -20,7 +33,7 @@ export class LabelService implements ILabelService {
 
   async getLabelById(id: number, userId: number): Promise<Label | null> {
     try {
-      const label = await mockDb.label.findUnique({
+      const label = await db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -41,7 +54,7 @@ export class LabelService implements ILabelService {
         throw new Error('Label name is required');
       }
 
-      const newLabel = await mockDb.label.create({
+      const newLabel = await db.label.create({
         data: {
           user_id: userId,
           name: data.name.trim(),
@@ -63,7 +76,7 @@ export class LabelService implements ILabelService {
   async updateLabel(id: number, userId: number, data: UpdateLabelInput): Promise<Label> {
     try {
       // Get the current label to check if it exists
-      const currentLabel = await mockDb.label.findUnique({
+      const currentLabel = await db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -79,7 +92,7 @@ export class LabelService implements ILabelService {
         throw new Error('Label name cannot be empty');
       }
 
-      const updatedLabel = await mockDb.label.update({
+      const updatedLabel = await db.label.update({
         where: {
           id: id,
           user_id: userId
@@ -108,7 +121,7 @@ export class LabelService implements ILabelService {
   async deleteLabel(id: number, userId: number): Promise<void> {
     try {
       // Get the label to check if it exists
-      const label = await mockDb.label.findUnique({
+      const label = await db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -119,7 +132,7 @@ export class LabelService implements ILabelService {
         throw new DatabaseError('Label not found', 'LABEL_NOT_FOUND');
       }
 
-      await mockDb.label.delete({
+      await db.label.delete({
         where: {
           id: id,
           user_id: userId
