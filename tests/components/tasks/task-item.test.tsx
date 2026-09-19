@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { renderWithProviders } from '../../utils'
-import TaskItem from '../../../src/components/tasks/task-item'
-import { testData } from '../../utils'
+import { describe, it, expect, vi } from 'vitest'
+import { renderWithProviders } from '../../../tests/utils.tsx'
+import { TaskItem } from '../../../src/components/tasks/task-item'
 
-describe('TaskItem Component', () => {
+describe('TaskList Component', () => {
   const mockTask = {
     id: 1,
     list_id: 1,
@@ -16,7 +15,7 @@ describe('TaskItem Component', () => {
   }
 
   it('should render task with title and status', () => {
-    const { getByText, container } = renderWithProviders(
+    const { getByText } = renderWithProviders(
       <TaskItem task={mockTask} />
     )
 
