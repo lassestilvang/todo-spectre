@@ -14,6 +14,7 @@ export const mockPrisma = {
   list: {
     findMany: vi.fn(),
     findUnique: vi.fn(),
+    findFirst: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
@@ -91,6 +92,19 @@ export const mockDatabaseResponses = {
     {
       id: 2,
       list_id: 1,
+      title: 'Work Task',
+      description: 'Work Description',
+      status: 'pending',
+      priority: 1,
+      created_at: new Date(),
+      updated_at: new Date(),
+      task_logs: [],
+      task_labels: [],
+      task_attachments: []
+    },
+    {
+      id: 3,
+      list_id: 1,
       title: 'Completed Task',
       description: 'Completed Description',
       status: 'completed',
@@ -137,15 +151,23 @@ export const mockDatabaseResponses = {
   ],
 }
 
+const initialMockDatabaseResponses = structuredClone(mockDatabaseResponses)
+
 // Set up mock responses
 export function setupMockDatabase() {
+  // Reset mutable mock data to initial state
+  Object.keys(mockDatabaseResponses).forEach((key) => {
+    // @ts-expect-error - dynamic key
+    mockDatabaseResponses[key] = structuredClone(initialMockDatabaseResponses[key])
+  })
+
   // Simple mock implementation that bypasses complex typing
-  const mockImplementation = (method: string, returnValue: any) => {
+  const mockImplementation = (method: string, returnValue: unknown) => {
     return vi.fn().mockImplementation(() => Promise.resolve(returnValue))
   }
 
   // User mocks
-  mockPrisma.user.findMany = mockImplementation('findMany', mockDatabaseResponses.users)
+  mockPrisma.user.findMany = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.users))
   mockPrisma.user.findUnique = vi.fn().mockImplementation(({ where }) => {
     const user = mockDatabaseResponses.users.find(u => u.id === where.id || u.email === where.email)
     return Promise.resolve(user || null)
@@ -162,12 +184,30 @@ export function setupMockDatabase() {
     mockDatabaseResponses.users.push(newUser)
     return Promise.resolve(newUser)
   })
-  mockPrisma.user.count = mockImplementation('count', mockDatabaseResponses.users.length)
+  mockPrisma.user.count = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.users.length))
 
   // List mocks
-  mockPrisma.list.findMany = mockImplementation('findMany', mockDatabaseResponses.lists)
+  mockPrisma.list.findMany = vi.fn().mockImplementation(({ where }) => {
+    let lists = [...mockDatabaseResponses.lists]
+
+    // Apply user_id filter if provided
+    if (where && where.user_id) {
+      lists = lists.filter(list => list.user_id === where.user_id)
+    }
+
+    return Promise.resolve(lists)
+  })
   mockPrisma.list.findUnique = vi.fn().mockImplementation(({ where }) => {
-    const list = mockDatabaseResponses.lists.find(l => l.id === where.id)
+    const list = mockDatabaseResponses.lists.find(l => l.id === where.id && l.user_id === where.user_id)
+    return Promise.resolve(list || null)
+  })
+  mockPrisma.list.findFirst = vi.fn().mockImplementation(({ where }) => {
+    const list = mockDatabaseResponses.lists.find(l => {
+      if (where.user_id !== undefined && l.user_id !== where.user_id) return false
+      if (where.title !== undefined && l.title !== where.title) return false
+      if (where.id !== undefined && l.id !== where.id) return false
+      return true
+    })
     return Promise.resolve(list || null)
   })
   mockPrisma.list.create = vi.fn().mockImplementation((data) => {
@@ -175,7 +215,26 @@ export function setupMockDatabase() {
     mockDatabaseResponses.lists.push(newList)
     return Promise.resolve(newList)
   })
-  mockPrisma.list.count = mockImplementation('count', mockDatabaseResponses.lists.length)
+  mockPrisma.list.update = vi.fn().mockImplementation(({ where, data }) => {
+    const listIndex = mockDatabaseResponses.lists.findIndex(l => l.id === where.id && l.user_id === where.user_id)
+    if (listIndex === -1) return Promise.resolve(null)
+
+    const updatedList = {
+      ...mockDatabaseResponses.lists[listIndex],
+      ...data,
+      updated_at: new Date()
+    }
+    mockDatabaseResponses.lists[listIndex] = updatedList
+    return Promise.resolve(updatedList)
+  })
+  mockPrisma.list.delete = vi.fn().mockImplementation(({ where }) => {
+    const listIndex = mockDatabaseResponses.lists.findIndex(l => l.id === where.id && l.user_id === where.user_id)
+    if (listIndex === -1) return Promise.resolve(null)
+
+    mockDatabaseResponses.lists.splice(listIndex, 1)
+    return Promise.resolve({})
+  })
+  mockPrisma.list.count = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.lists.length))
 
   // Task mocks
   mockPrisma.task.findMany = vi.fn().mockImplementation(({ where }) => {
@@ -183,7 +242,7 @@ export function setupMockDatabase() {
 
     // Apply filters if provided
     if (where) {
-      // Handle list.user_id filter
+      // Handle list.user_id filter (from task-service pattern: { list: { user_id: userId } })
       if (where.list && where.list.user_id) {
         tasks = tasks.filter(task => task.list_id === where.list.user_id)
       }
@@ -195,13 +254,14 @@ export function setupMockDatabase() {
       if (where.priority) {
         tasks = tasks.filter(task => task.priority === where.priority)
       }
-      // Handle list_id filter
+      // Handle list_id filter (direct list_id)
       if (where.list_id) {
         tasks = tasks.filter(task => task.list_id === where.list_id)
       }
-      // Handle complex AND conditions (list.user_id AND priority)
+      // Handle AND conditions
       if (where.AND) {
         where.AND.forEach(condition => {
+          // Handle list.user_id in AND conditions
           if (condition.list && condition.list.user_id) {
             tasks = tasks.filter(task => task.list_id === condition.list.user_id)
           }
@@ -211,6 +271,9 @@ export function setupMockDatabase() {
           if (condition.status) {
             tasks = tasks.filter(task => task.status === condition.status)
           }
+          if (condition.list_id) {
+            tasks = tasks.filter(task => task.list_id === condition.list_id)
+          }
         })
       }
     }
@@ -219,6 +282,13 @@ export function setupMockDatabase() {
   })
   mockPrisma.task.findUnique = vi.fn().mockImplementation(({ where }) => {
     const task = mockDatabaseResponses.tasks.find(t => t.id === where.id)
+    // If list.user_id filter is provided, also check user association
+    if (task && where.list && where.list.user_id) {
+      const list = mockDatabaseResponses.lists.find(l => l.id === task.list_id)
+      if (!list || list.user_id !== where.list.user_id) {
+        return Promise.resolve(null)
+      }
+    }
     return Promise.resolve(task || null)
   })
   mockPrisma.task.create = vi.fn().mockImplementation((data) => {
@@ -254,7 +324,7 @@ export function setupMockDatabase() {
     mockDatabaseResponses.tasks.splice(taskIndex, 1)
     return Promise.resolve(deletedTask)
   })
-  mockPrisma.task.count = mockImplementation('count', mockDatabaseResponses.tasks.length)
+  mockPrisma.task.count = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.tasks.length))
 
   // TaskView mocks
   mockPrisma.taskView.findMany = vi.fn().mockImplementation(({ where }) => {
@@ -299,7 +369,7 @@ export function setupMockDatabase() {
     mockDatabaseResponses.taskViews.splice(viewIndex, 1)
     return Promise.resolve({})
   })
-  mockPrisma.taskView.count = mockImplementation('count', mockDatabaseResponses.taskViews.length)
+  mockPrisma.taskView.count = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.taskViews.length))
 
   // View mocks
   mockPrisma.view.findMany = vi.fn().mockImplementation(({ where }) => {
@@ -344,7 +414,7 @@ export function setupMockDatabase() {
     mockDatabaseResponses.views.splice(viewIndex, 1)
     return Promise.resolve({})
   })
-  mockPrisma.view.count = mockImplementation('count', mockDatabaseResponses.views.length)
+  mockPrisma.view.count = vi.fn().mockImplementation(() => Promise.resolve(mockDatabaseResponses.views.length))
 
   // TaskLog mocks
   mockPrisma.taskLog = {
@@ -403,10 +473,11 @@ export function setupMockDatabase() {
 // Reset all mocks
 export function resetMockDatabase() {
   vi.clearAllMocks()
-  Object.keys(mockDatabaseResponses).forEach(key => {
-    // @ts-expect-error - This is a mock function that intentionally has incorrect typing
-    mockDatabaseResponses[key] = []
+  Object.keys(mockDatabaseResponses).forEach((key) => {
+    // @ts-expect-error - dynamic key
+    mockDatabaseResponses[key] = structuredClone(initialMockDatabaseResponses[key])
   })
+  setupMockDatabase()
 }
 
 // Mock Prisma module
