@@ -11,7 +11,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 
 export default function ListPage() {
   const params = useParams();
-  const [list, setList] = useState<unknown>(null);
+  const [list, setList] = useState<{ icon?: string; title?: string } | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -88,7 +88,7 @@ export default function ListPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
-          {(list as unknown)?.icon} {(list as unknown)?.title}
+          {list?.icon} {list?.title}
         </h1>
         <button
           onClick={() => setShowCreateForm(true)}
@@ -100,7 +100,7 @@ export default function ListPage() {
 
       <TaskList
         tasks={tasks}
-        title={`Tasks in ${(list as unknown)?.title || 'List'} (${tasks.length})`}
+        title={`Tasks in ${list?.title || 'List'} (${tasks.length})`}
         onTaskClick={setSelectedTask}
         onRefresh={fetchListAndTasks}
       />
