@@ -61,9 +61,9 @@ export function SearchModal() {
         trackSearch(searchQuery, searchResults.length);
       }
     }
-  }, [searchQuery, filters, page]);
+  }, [searchQuery, filters, page, searchResults.length]);
 
-  const handleResultClick = (result: Task | List) => {
+  const handleResultClick = useCallback((result: Task | List) => {
     if (result.hasOwnProperty('list_id')) {
       // It's a task
       const task = result as Task;
@@ -76,7 +76,7 @@ export function SearchModal() {
       router.push(`/lists/${list.id}`);
     }
     closeSearch();
-  };
+  }, [closeSearch, router]);
 
   useEffect(() => {
     if (isSearchOpen) {
