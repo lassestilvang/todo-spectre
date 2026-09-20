@@ -138,7 +138,7 @@ export function withViewTransitionFallback(
 
     return React.createElement(
       ViewTransitionWrapper,
-      { config: fallbackConfig } as unknown,
+      { config: fallbackConfig } as { config: ViewTransitionConfig; children: React.ReactNode },
       React.createElement(Component, props)
     ) as unknown
   }
