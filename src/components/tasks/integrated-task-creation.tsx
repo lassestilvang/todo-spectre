@@ -22,6 +22,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
   const [activeTab, setActiveTab] = useState<'form' | 'natural' | 'scheduling'>('form');
   const [parsedTaskData, setParsedTaskData] = useState<Partial<Task> | null>(null);
   const [schedulingSuggestions, setSchedulingSuggestions] = useState<ScheduleSuggestion[]>([]);
+  void schedulingSuggestions;
   const [selectedSuggestion, setSelectedSuggestion] = useState<ScheduleSuggestion | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +108,7 @@ export function IntegratedTaskCreation({ onTaskCreated, onClose, listId }: Integ
       setIsLoading(false);
     }
   };
+  void handleNaturalLanguageSubmit;
 
   const handleSuggestionSelected = (suggestion: ScheduleSuggestion) => {
     setSelectedSuggestion(suggestion);
