@@ -2,11 +2,11 @@
 
 import { useTheme } from '@/components/theme-provider';
 import { Button } from './button';
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Moon, Sun } from "lucide-react";
 import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme, isDarkMode, systemTheme, isSystemDark } = useTheme();
+  const { theme, toggleTheme, isDarkMode, isSystemDark } = useTheme();
 
   const getIcon = () => {
     if (theme === 'system') {
