@@ -11,7 +11,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 
 export default function LabelPage() {
   const params = useParams();
-  const [label, setLabel] = useState<unknown>(null);
+  const [label, setLabel] = useState<{ icon?: string; name?: string } | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -88,7 +88,7 @@ export default function LabelPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
-          {(label as unknown)?.icon} {(label as unknown)?.name}
+          {label?.icon} {label?.name}
         </h1>
         <button
           onClick={() => setShowCreateForm(true)}
