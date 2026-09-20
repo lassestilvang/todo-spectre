@@ -20,6 +20,13 @@ import { Task, CreateTaskInput, UpdateTaskInput, TaskService as ITaskService, Ta
 import { TaskFilterCriteria as FilterCriteria } from '@/types/filter-types';
 
 export class TaskService implements ITaskService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(dbOverride?: any) {
+    this.db = dbOverride ?? db;
+  }
+
   async getAllTasks(userId: number, filters?: FilterCriteria): Promise<Task[]> {
     try {
       const whereClause: {
@@ -50,7 +57,7 @@ export class TaskService implements ITaskService {
         }
       }
 
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: whereClause,
         include: {
           task_logs: true,
@@ -70,9 +77,10 @@ export class TaskService implements ITaskService {
   }
 
   async getTaskById(id: number, _userId: number): Promise<Task | null> {
+    void _userId;
     try {
       // For mock database, just find by ID since we don't have proper user associations
-      const task = await db.task.findUnique({
+      const task = await this.db.task.findUnique({
         where: {
           id: id
         },
@@ -110,7 +118,7 @@ export class TaskService implements ITaskService {
         throw new Error('Actual time must be a positive number');
       }
 
-      const newTask = await db.task.create({
+      const newTask = await this.db.task.create({
         data: {
           list_id: data.list_id,
           title: data.title.trim(),
@@ -158,7 +166,7 @@ export class TaskService implements ITaskService {
   async updateTask(id: number, userId: number, data: UpdateTaskInput): Promise<Task> {
     try {
       // Get the current task to check if it exists
-      const currentTask = await db.task.findUnique({
+      const currentTask = await this.db.task.findUnique({
         where: {
           id: id
         }
@@ -201,7 +209,7 @@ export class TaskService implements ITaskService {
         changes.status = { from: currentTask.status, to: data.status };
       }
 
-      const updatedTask = await db.task.update({
+      const updatedTask = await this.db.task.update({
         where: {
           id: id
         },
@@ -258,7 +266,7 @@ export class TaskService implements ITaskService {
   async deleteTask(id: number, userId: number): Promise<void> {
     try {
       // Get the task to check if it exists
-      const task = await db.task.findUnique({
+      const task = await this.db.task.findUnique({
         where: {
           id: id
         }
@@ -276,7 +284,7 @@ export class TaskService implements ITaskService {
         status: task.status
       });
 
-      await db.task.delete({
+      await this.db.task.delete({
         where: {
           id: id
         }
@@ -291,8 +299,9 @@ export class TaskService implements ITaskService {
   }
 
   async addTaskLog(taskId: number, _userId: number, action: string, changes?: Record<string, unknown>): Promise<TaskLog> {
+    void _userId;
     try {
-      const taskLog = await db.taskLog.create({
+      const taskLog = await this.db.taskLog.create({
         data: {
           task_id: taskId,
           action: action,
@@ -308,9 +317,10 @@ export class TaskService implements ITaskService {
   }
 
   async getTaskLogs(taskId: number, _userId: number): Promise<TaskLog[]> {
+    void _userId;
     try {
       // Verify the task belongs to the user
-      const task = await db.task.findUnique({
+      const task = await this.db.task.findUnique({
         where: {
           id: taskId
         }
@@ -320,7 +330,7 @@ export class TaskService implements ITaskService {
         throw new DatabaseError('Task not found', 'TASK_NOT_FOUND');
       }
 
-      const logs = await db.taskLog.findMany({
+      const logs = await this.db.taskLog.findMany({
         where: {
           task_id: taskId
         },
@@ -341,7 +351,7 @@ export class TaskService implements ITaskService {
 
   async getTasksByDateRange(userId: number, startDate: Date, endDate: Date): Promise<Task[]> {
     try {
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -384,7 +394,7 @@ export class TaskService implements ITaskService {
       const endDate = new Date();
       endDate.setDate(now.getDate() + 7); // Next 7 days
 
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -424,7 +434,7 @@ export class TaskService implements ITaskService {
 
   async getTasksByPriority(userId: number, priority: number): Promise<Task[]> {
     try {
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -450,7 +460,7 @@ export class TaskService implements ITaskService {
 
   async getTasksByStatus(userId: number, status: string): Promise<Task[]> {
     try {
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -476,7 +486,7 @@ export class TaskService implements ITaskService {
 
   async getTasksByList(userId: number, listId: number): Promise<Task[]> {
     try {
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list_id: listId,
           list: {
@@ -503,7 +513,7 @@ export class TaskService implements ITaskService {
   async getTasksByLabel(userId: number, labelId: number): Promise<Task[]> {
     try {
       // Get all tasks for the user
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -520,8 +530,8 @@ export class TaskService implements ITaskService {
       });
 
       // Filter tasks that have the specified label
-      const filteredTasks = (tasks as unknown[]).filter((task: unknown) => {
-        return task.task_labels?.some((label: { id: number }) => label.id === labelId);
+      const filteredTasks = (tasks as unknown[]).filter((task) => {
+        return (task as { task_labels?: { id: number }[] })?.task_labels?.some((label: { id: number }) => label.id === labelId);
       });
 
       return filteredTasks as Task[];
