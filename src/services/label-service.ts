@@ -16,9 +16,16 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 export class LabelService implements ILabelService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(dbOverride?: any) {
+    this.db = dbOverride ?? db;
+  }
+
   async getAllLabels(userId: number): Promise<Label[]> {
     try {
-      const labels = await db.label.findMany({
+      const labels = await this.db.label.findMany({
         where: {
           user_id: userId
         }
@@ -33,7 +40,7 @@ export class LabelService implements ILabelService {
 
   async getLabelById(id: number, userId: number): Promise<Label | null> {
     try {
-      const label = await db.label.findUnique({
+      const label = await this.db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -54,7 +61,7 @@ export class LabelService implements ILabelService {
         throw new Error('Label name is required');
       }
 
-      const newLabel = await db.label.create({
+      const newLabel = await this.db.label.create({
         data: {
           user_id: userId,
           name: data.name.trim(),
@@ -76,7 +83,7 @@ export class LabelService implements ILabelService {
   async updateLabel(id: number, userId: number, data: UpdateLabelInput): Promise<Label> {
     try {
       // Get the current label to check if it exists
-      const currentLabel = await db.label.findUnique({
+      const currentLabel = await this.db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -92,7 +99,7 @@ export class LabelService implements ILabelService {
         throw new Error('Label name cannot be empty');
       }
 
-      const updatedLabel = await db.label.update({
+      const updatedLabel = await this.db.label.update({
         where: {
           id: id,
           user_id: userId
@@ -121,7 +128,7 @@ export class LabelService implements ILabelService {
   async deleteLabel(id: number, userId: number): Promise<void> {
     try {
       // Get the label to check if it exists
-      const label = await db.label.findUnique({
+      const label = await this.db.label.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -132,7 +139,7 @@ export class LabelService implements ILabelService {
         throw new DatabaseError('Label not found', 'LABEL_NOT_FOUND');
       }
 
-      await db.label.delete({
+      await this.db.label.delete({
         where: {
           id: id,
           user_id: userId
