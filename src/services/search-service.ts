@@ -60,6 +60,13 @@ function fuzzyMatch(query: string, text: string): number {
 }
 
 export class SearchService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(dbOverride?: any) {
+    this.db = dbOverride ?? db;
+  }
+
   async searchTasks(
     userId: number,
     query: string,
@@ -71,7 +78,7 @@ export class SearchService {
       const offset = (page - 1) * limit;
 
       // Get all tasks and lists for the user
-      const tasks = await db.task.findMany({
+      const tasks = await this.db.task.findMany({
         where: {
           list: {
             user_id: userId
@@ -84,7 +91,7 @@ export class SearchService {
         }
       });
 
-      const lists = await db.list.findMany({
+      const lists = await this.db.list.findMany({
         where: {
           user_id: userId
         }
@@ -141,10 +148,10 @@ export class SearchService {
             .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
             .map((result: { item: unknown }) => result.item);
 
-          searchResults.push(...(listResults as unknown));
+          searchResults.push(...(listResults as (Task | List)[]));
         }
 
-        searchResults.push(...(taskResults as unknown));
+        searchResults.push(...(taskResults as (Task | List)[]));
       } else {
         // If no query, return all filtered tasks
         searchResults.push(...filteredTasks);
