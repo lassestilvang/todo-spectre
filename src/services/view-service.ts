@@ -25,9 +25,16 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 export class ViewService implements IViewService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(dbOverride?: any) {
+    this.db = dbOverride ?? db;
+  }
+
   async getAllViews(userId: number): Promise<View[]> {
     try {
-      const views = await db.view.findMany({
+      const views = await this.db.view.findMany({
         where: {
           user_id: userId
         }
@@ -42,7 +49,7 @@ export class ViewService implements IViewService {
 
   async getViewById(id: number, userId: number): Promise<View | null> {
     try {
-      const view = await db.view.findUnique({
+      const view = await this.db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -67,7 +74,7 @@ export class ViewService implements IViewService {
         throw new Error('Invalid view type');
       }
 
-      const newView = await db.view.create({
+      const newView = await this.db.view.create({
         data: {
           user_id: userId,
           name: data.name.trim(),
@@ -91,7 +98,7 @@ export class ViewService implements IViewService {
   async updateView(id: number, userId: number, data: UpdateViewInput): Promise<View> {
     try {
       // Get the current view to check if it exists
-      const currentView = await db.view.findUnique({
+      const currentView = await this.db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -111,7 +118,7 @@ export class ViewService implements IViewService {
         throw new Error('Invalid view type');
       }
 
-      const updatedView = await db.view.update({
+      const updatedView = await this.db.view.update({
         where: {
           id: id,
           user_id: userId
@@ -146,7 +153,7 @@ export class ViewService implements IViewService {
   async deleteView(id: number, userId: number): Promise<void> {
     try {
       // Get the view to check if it exists
-      const view = await db.view.findUnique({
+      const view = await this.db.view.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -157,7 +164,7 @@ export class ViewService implements IViewService {
         throw new DatabaseError('View not found', 'VIEW_NOT_FOUND');
       }
 
-      await db.view.delete({
+      await this.db.view.delete({
         where: {
           id: id,
           user_id: userId
