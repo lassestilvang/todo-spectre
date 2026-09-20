@@ -7,7 +7,7 @@ import { TaskList } from './task-list';
 import { CreateTaskForm } from './create-task-form';
 import { TaskDetailView } from './task-detail-view';
 import { Task } from '@/types/task-types';
-import { format, addDays, startOfToday, endOfToday } from 'date-fns';
+import { addDays, startOfToday, endOfToday } from "date-fns";
 
 export function TaskManagement() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -54,7 +54,6 @@ export function TaskManagement() {
   };
 
   const getFilteredTasks = (filterType: string): Task[] => {
-    const now = new Date();
 
     switch (filterType) {
       case 'today':
