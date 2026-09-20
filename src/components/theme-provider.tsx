@@ -38,6 +38,8 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  void defaultTheme;
+  void storageKey;
   const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
   const { theme, setTheme, resolvedTheme, systemTheme: nextSystemTheme } = useNextTheme();
 
