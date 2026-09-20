@@ -24,7 +24,7 @@ export function ViewContainer({
   onRefresh
 }: ViewContainerProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
