@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { Button } from './button';
 import { motion } from 'framer-motion';
-import { File, Plus, Search, Inbox, Calendar, List } from 'lucide-react';
+import { File, Search, Inbox, Calendar, List } from "lucide-react";
 
 type EmptyStateType = 'tasks' | 'lists' | 'search' | 'inbox' | 'calendar' | 'custom';
 
