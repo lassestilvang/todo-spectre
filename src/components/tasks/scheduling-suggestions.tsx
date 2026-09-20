@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorDisplay } from '@/components/ui/error-display';
@@ -24,6 +23,7 @@ export function SchedulingSuggestions({
   dueDate
 }: SchedulingSuggestionsProps) {
   const [suggestions, setSuggestions] = useState<ScheduleSuggestion[]>([]);
+  void onClose;
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSuggestion, setSelectedSuggestion] = useState<ScheduleSuggestion | null>(null);
@@ -101,7 +101,6 @@ export function SchedulingSuggestions({
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {suggestions.map((suggestion, index) => {
-              const priorityScore = getPriorityScore(suggestion);
               const isSelected = selectedSuggestion?.start_time === suggestion.start_time;
 
               return (
