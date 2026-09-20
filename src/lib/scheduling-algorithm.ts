@@ -93,14 +93,6 @@ export class SchedulingAlgorithm {
    */
   private static getSuggestionReason(startTime: DateTime, durationHours: number): string {
     const hour = startTime.hour;
-    const reasons = [
-      'Optimal focus time based on your productivity patterns',
-      'Good time slot with minimal conflicts',
-      'Aligned with your preferred working hours',
-      'Provides sufficient time buffer before other commitments',
-      'Best availability in your schedule'
-    ];
-
     if (durationHours >= 4) {
       return 'Extended time block for deep work sessions';
     } else if (hour < 12) {
@@ -116,6 +108,7 @@ export class SchedulingAlgorithm {
    * Analyze user's availability based on existing tasks
    */
   public static async analyzeAvailability(_userId: number): Promise<AvailabilityAnalysis> {
+    void _userId;
     // In a real implementation, this would:
     // 1. Fetch all user's tasks and events
     // 2. Analyze time distribution
