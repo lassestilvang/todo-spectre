@@ -5,6 +5,7 @@ import "../styles/css-variables.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
 import { Toaster } from "sonner";
+import { ServiceWorkerRegistration } from "@/components/pwa/service-worker-registration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
           <Providers>
             {children}
             <Toaster position="bottom-right" richColors />
+            <ServiceWorkerRegistration />
           </Providers>
         </ThemeProvider>
       </body>
