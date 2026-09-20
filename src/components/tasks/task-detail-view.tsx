@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,12 +21,14 @@ interface TaskDetailViewProps {
 export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskDetailViewProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [logs, setLogs] = useState<TaskLog[]>([]);
+  const [comments, setComments] = useState<{ id: number; content: string; user?: { name?: string; email?: string }; created_at: string }[]>([]);
+  const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showLogs, setShowLogs] = useState(false);
   const router = useRouter();
 
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/tasks/${taskId}`);
@@ -41,9 +43,9 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskD
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [taskId]);
 
-  const fetchTaskLogs = async () => {
+  const fetchTaskLogs = useCallback(async () => {
     try {
       const response = await fetch(`/api/tasks/${taskId}/logs`);
       if (!response.ok) {
@@ -54,14 +56,36 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskD
     } catch (err) {
       console.error('Error fetching task logs:', err);
     }
-  };
+  }, [taskId]);
 
   useEffect(() => {
     if (taskId && isOpen) {
       fetchTask();
       fetchTaskLogs();
+      fetch(`/api/tasks/${taskId}/comments`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data) => setComments(Array.isArray(data) ? data : []))
+        .catch(() => setComments([]));
     }
   }, [taskId, isOpen, fetchTask, fetchTaskLogs]);
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newComment.trim() }),
+      });
+      if (res.ok) {
+        const c = await res.json();
+        setComments((prev) => [...prev, c]);
+        setNewComment('');
+      }
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -118,7 +142,28 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskD
           <div className="flex justify-center items-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
-        </DialogContent>
+        <div className="px-6 pb-6">
+        <h3 className="font-semibold mb-2">Comments</h3>
+        <div className="space-y-2 mb-3">
+          {comments.map((c) => (
+            <div key={c.id} className="text-sm border rounded p-2">
+              <div className="font-medium">{c.user?.name || c.user?.email || 'User'}</div>
+              <div>{c.content}</div>
+            </div>
+          ))}
+          {comments.length === 0 && <div className="text-sm text-muted-foreground">No comments yet.</div>}
+        </div>
+        <div className="flex gap-2">
+          <input
+            className="flex-1 border rounded px-2 py-1 text-sm"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+          />
+          <Button size="sm" onClick={handleAddComment}>Post</Button>
+        </div>
+      </div>
+      </DialogContent>
       </Dialog>
     );
   }
@@ -358,7 +403,7 @@ export function TaskDetailView({ taskId, isOpen, onClose, onTaskDeleted }: TaskD
                               try {
                                 const changes = JSON.parse(log.changes!);
                                 alert(JSON.stringify(changes, null, 2));
-                              } catch (e) {
+                              } catch {
                                 alert(log.changes!);
                               }
                             }}
