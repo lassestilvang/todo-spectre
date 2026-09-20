@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from "react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isToday } from 'date-fns';
 import { Button } from './button';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 interface DatePickerProps {
@@ -18,7 +17,6 @@ export function DatePicker({ value, onChange, placeholder = 'Select a date', cla
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
   const [currentMonth, setCurrentMonth] = useState<Date>(value || new Date());
   const [isOpen, setIsOpen] = useState(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSelectedDate(value);
