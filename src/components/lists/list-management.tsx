@@ -95,6 +95,29 @@ export function ListManagement() {
     setIsEditDialogOpen(true);
   };
 
+
+  const handleShareList = async (listId: number) => {
+    const email = window.prompt('Enter email to share with:');
+    if (!email) return;
+    const role = window.prompt('Role (viewer/editor):', 'viewer') || 'viewer';
+    try {
+      const res = await fetch(`/api/lists/${listId}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role }),
+      });
+      if (res.ok) {
+        alert('List shared successfully');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to share list');
+      }
+    } catch (err) {
+      console.error('Error sharing list:', err);
+      alert('Failed to share list');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
