@@ -18,13 +18,20 @@ if (process.env.NODE_ENV === 'test') {
 import { List, CreateListInput, UpdateListInput, ListService as IListService } from '@/types/list-types';
 
 export class ListService implements IListService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(dbOverride?: any) {
+    this.db = dbOverride ?? db;
+  }
+
   private DEFAULT_LIST_TITLE = 'Inbox';
   private DEFAULT_LIST_COLOR = '#6366f1'; // Indigo color
   private DEFAULT_LIST_ICON = '📥';
 
   async getAllLists(userId: number): Promise<List[]> {
     try {
-      const lists = await db.list.findMany({
+      const lists = await this.db.list.findMany({
         where: {
           user_id: userId
         }
@@ -39,7 +46,7 @@ export class ListService implements IListService {
 
   async getListById(id: number, userId: number): Promise<List | null> {
     try {
-      const list = await db.list.findUnique({
+      const list = await this.db.list.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -60,7 +67,7 @@ export class ListService implements IListService {
         throw new Error('List title is required');
       }
 
-      const newList = await db.list.create({
+      const newList = await this.db.list.create({
         data: {
           user_id: userId,
           title: data.title.trim(),
@@ -82,7 +89,7 @@ export class ListService implements IListService {
   async updateList(id: number, userId: number, data: UpdateListInput): Promise<List> {
     try {
       // Get the current list to check if it's the default list
-      const currentList = await db.list.findUnique({
+      const currentList = await this.db.list.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -106,7 +113,7 @@ export class ListService implements IListService {
         throw new Error('List title cannot be empty');
       }
 
-      const updatedList = await db.list.update({
+      const updatedList = await this.db.list.update({
         where: {
           id: id,
           user_id: userId
@@ -135,7 +142,7 @@ export class ListService implements IListService {
   async deleteList(id: number, userId: number): Promise<void> {
     try {
       // Get the list to check if it's the default list
-      const list = await db.list.findUnique({
+      const list = await this.db.list.findUnique({
         where: {
           id: id,
           user_id: userId
@@ -151,7 +158,7 @@ export class ListService implements IListService {
         throw new DatabaseError('Cannot delete the Inbox list', 'INBOX_DELETE_ERROR');
       }
 
-      await db.list.delete({
+      await this.db.list.delete({
         where: {
           id: id,
           user_id: userId
@@ -169,7 +176,7 @@ export class ListService implements IListService {
   async getDefaultList(userId: number): Promise<List> {
     try {
       // Try to find an existing Inbox list
-      let defaultList = await db.list.findFirst({
+      let defaultList = await this.db.list.findFirst({
         where: {
           user_id: userId,
           title: this.DEFAULT_LIST_TITLE
@@ -191,7 +198,7 @@ export class ListService implements IListService {
   async ensureDefaultList(userId: number): Promise<List> {
     try {
       // Check if default list exists
-      const existingDefault = await db.list.findFirst({
+      const existingDefault = await this.db.list.findFirst({
         where: {
           user_id: userId,
           title: this.DEFAULT_LIST_TITLE
@@ -211,7 +218,7 @@ export class ListService implements IListService {
   }
 
   private async createDefaultList(userId: number): Promise<List> {
-    const newList = await db.list.create({
+    const newList = await this.db.list.create({
       data: {
         user_id: userId,
         title: this.DEFAULT_LIST_TITLE,
