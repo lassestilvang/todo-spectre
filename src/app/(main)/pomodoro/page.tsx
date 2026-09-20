@@ -42,7 +42,7 @@ export default function PomodoroPage() {
       }, 0);
     }
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft, mode, completedPomodoros]);
+  }, [isRunning, timeLeft, mode, completedPomodoros, durations.longBreak, durations.shortBreak, durations.work]);
 
   const toggleTimer = () => {
     setIsRunning(!isRunning);
