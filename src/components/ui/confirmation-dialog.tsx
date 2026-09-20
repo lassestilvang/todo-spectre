@@ -4,7 +4,6 @@ import { ReactNode } from 'react';
 import { Button } from './button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from './dialog';
 import { AlertTriangle, Trash2, AlertCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
