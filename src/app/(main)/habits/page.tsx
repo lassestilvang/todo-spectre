@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Flame, Trophy, Calendar } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface Habit {
   id: number;
@@ -18,7 +17,7 @@ interface Habit {
 }
 
 export default function HabitsPage() {
-  const [habits, setHabits] = useState<Habit[]>([
+  const [habits] = useState<Habit[]>([
     {
       id: 1,
       title: 'Morning Exercise',
