@@ -44,26 +44,24 @@ vi.mock('next-auth/react', () => ({
   signOut: vi.fn(),
 }))
 
-beforeEach(() => {
+beforeEach(async () => {
   process.env.NEXT_PUBLIC_API_BASE_URL = 'http://localhost:3001/api'
 
-  void (async () => {
-    try {
-      const { seedTestData } = await import('../scripts/seed-test-data')
-      const { setupMockDatabase, mockDatabaseResponses } = await import('./mocks/mock-db')
+  try {
+    const { seedTestData } = await import('../scripts/seed-test-data')
+    const { setupMockDatabase, mockDatabaseResponses } = await import('./mocks/mock-db')
 
-      mockDatabaseResponses.users = []
-      mockDatabaseResponses.lists = []
-      mockDatabaseResponses.tasks = []
-      mockDatabaseResponses.taskViews = []
-      mockDatabaseResponses.taskLogs = []
+    mockDatabaseResponses.users = []
+    mockDatabaseResponses.lists = []
+    mockDatabaseResponses.tasks = []
+    mockDatabaseResponses.taskViews = []
+    mockDatabaseResponses.taskLogs = []
 
-      seedTestData()
-      setupMockDatabase()
-    } catch (error) {
-      console.warn('Test data seeding failed:', error)
-    }
-  })()
+    seedTestData()
+    setupMockDatabase()
+  } catch (error) {
+    console.warn('Test data seeding failed:', error)
+  }
 })
 
 afterEach(() => {
