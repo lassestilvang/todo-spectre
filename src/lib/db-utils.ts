@@ -168,7 +168,7 @@ export async function getDatabaseHealth(): Promise<{
         const model = prisma[table.toLowerCase() as keyof typeof prisma] as unknown;
         const count = await (model as { count: () => Promise<number> }).count()
         recordCounts[table] = count
-      } catch (countError) {
+      } catch {
         recordCounts[table] = 0
       }
     }
