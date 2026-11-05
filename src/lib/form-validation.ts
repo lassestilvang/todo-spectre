@@ -34,8 +34,8 @@ export const taskSchema = z.object({
 export const viewSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name too long'),
   type: z.enum(['day', 'week', 'month', 'custom']),
-  filter_criteria: z.record(z.any()).optional(),
-  sort_order: z.record(z.any()).optional(),
+  filter_criteria: z.record(z.string(), z.any()).optional(),
+  sort_order: z.record(z.string(), z.any()).optional(),
 })
 
 // Form validation utility
@@ -57,7 +57,7 @@ export function validateForm<T>(schema: z.ZodSchema<T>, data: unknown): {
 export function formatValidationErrors(error: z.ZodError): Record<string, string> {
   const errors: Record<string, string> = {}
 
-  error.errors.forEach((err) => {
+  error.issues.forEach((err) => {
     const path = err.path.join('.')
     errors[path] = err.message
   })
